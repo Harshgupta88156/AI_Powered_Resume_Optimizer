@@ -1,4 +1,4 @@
-const apiBaseUrl = 'https://api.resumeoptimizer.com';
+const apiBaseUrl = 'https://resume-optimizer-gateway.onrender.com';
 
 export const environment = {
   production: true,
