@@ -23,15 +23,22 @@
 nav {
   display: flex;
   align-items: center;
+  gap: 0;
+}
+
+.nav-links,
+.nav-actions {
+  display: flex;
+  align-items: center;
   gap: 28px;
 }
 
-  nav a {
-    text-decoration: none;
-    color: var(--secondary);
-    font-weight: 500;
-    cursor: pointer;
-  }
+nav a {
+  text-decoration: none;
+  color: var(--secondary);
+  font-weight: 500;
+  cursor: pointer;
+}
 
 button {
   padding: 12px 20px;
@@ -96,56 +103,95 @@ button {
 
 @media (max-width: 640px) {
   .navbar {
-    height: auto;
-    min-height: 64px;
-    padding: 14px 16px;
+    min-height: 0;
+    padding: 16px 16px 18px;
     flex-direction: column;
     align-items: stretch;
-    gap: 14px;
+    gap: 16px;
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, .08);
   }
 
   .navbar .logo {
     font-size: 24px;
     align-self: flex-start;
+    letter-spacing: -.04em;
   }
 
   nav {
     width: 100%;
-    justify-content: center;
-    gap: 8px 14px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
   }
 
-  nav a,
-  nav button,
-  nav app-theme-toggle {
+  .nav-links,
+  .nav-actions {
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .nav-links a {
+    flex: 1;
+    max-width: 150px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface-alt);
+    text-align: center;
+    font-size: 13px;
+    transition: color .2s ease, border-color .2s ease, background-color .2s ease;
+  }
+
+  .nav-links a:hover {
+    color: var(--primary);
+    border-color: var(--primary);
+    background: var(--primary-soft);
+  }
+
+  .nav-actions {
+    gap: 10px;
+  }
+
+  .nav-actions > a:not(.nav-user) {
+    padding: 10px 12px;
     font-size: 13px;
   }
 
-  nav button {
+  .nav-actions > button {
+    flex: 1;
+    min-height: 42px;
     padding: 10px 14px;
+    font-size: 13px;
+    box-shadow: 0 5px 12px rgba(37, 99, 235, .22);
   }
 }
 
 @media (max-width: 380px) {
   .navbar {
-    padding-inline: 12px;
+    padding: 14px 12px 16px;
   }
 
   .navbar .logo {
     font-size: 22px;
   }
 
-  nav {
-    gap: 8px 10px;
+  .nav-links,
+  .nav-actions {
+    gap: 7px;
   }
 
-  nav a,
-  nav button {
+  .nav-links a {
+    padding: 9px 8px;
     font-size: 12px;
   }
 
-  nav button {
-    padding: 9px 11px;
+  .nav-actions > a:not(.nav-user),
+  .nav-actions > button {
+    font-size: 12px;
+  }
+
+  .nav-actions > button {
+    padding-inline: 10px;
   }
 }
