@@ -105,7 +105,7 @@ button {
     min-height: 0;
     padding: 16px 16px 18px;
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
     gap: 16px;
     border-bottom: 1px solid var(--border);
     box-shadow: 0 8px 24px rgba(15, 23, 42, .08);
@@ -113,20 +113,21 @@ button {
 
   .navbar .logo {
     font-size: 24px;
-    align-self: flex-start;
+    align-self: center;
     letter-spacing: -.04em;
+    text-align: center;
   }
 
   nav {
-    width: 100%;
+    width: auto;
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
     gap: 10px;
   }
 
   .nav-actions {
-    width: 100%;
-    justify-content: flex-end;
+    width: auto;
+    justify-content: center;
     gap: 10px;
   }
 
