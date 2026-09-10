@@ -127,26 +127,50 @@ button {
   }
 
   .nav-actions {
-    width: auto;
+    width: min(100%, 300px);
+    padding: 5px;
     justify-content: center;
-    gap: 10px;
+    gap: 6px;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, .08);
   }
 
   .nav-actions > app-theme-toggle {
     flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
   }
 
   .nav-actions > a:not(.nav-user) {
-    padding: 10px 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 58px;
+    min-height: 40px;
+    padding: 0 12px;
+    border-radius: 11px;
     font-size: 13px;
+    color: var(--text);
+    transition: background-color .2s ease, color .2s ease;
+  }
+
+  .nav-actions > a:not(.nav-user):hover {
+    background: var(--surface);
+    color: var(--primary);
   }
 
   .nav-actions > button {
     flex: 0 0 auto;
-    min-height: 42px;
-    padding: 10px 14px;
+    min-height: 40px;
+    padding: 0 16px;
     font-size: 13px;
-    box-shadow: 0 5px 12px rgba(37, 99, 235, .22);
+    border-radius: 11px;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, .24);
   }
 }
 
@@ -160,7 +184,7 @@ button {
   }
 
   .nav-actions {
-    gap: 7px;
+    gap: 5px;
   }
 
   .nav-actions > a:not(.nav-user),
@@ -169,6 +193,6 @@ button {
   }
 
   .nav-actions > button {
-    padding-inline: 10px;
+    padding-inline: 12px;
   }
 }

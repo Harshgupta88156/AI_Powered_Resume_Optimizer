@@ -36,3 +36,15 @@
   .theme-label { display: none; }
   .theme-toggle { padding: 8px; }
 }
+
+@media (max-width: 640px) {
+  :host-context(.navbar) .theme-toggle {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 11px;
+    background: var(--surface);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, .08);
+  }
+}
