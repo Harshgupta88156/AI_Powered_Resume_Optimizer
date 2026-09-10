@@ -291,6 +291,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  min-width: 0;
 }
 
 .page-header {
@@ -407,6 +408,37 @@ body {
   gap: 0 18px;
 }
 
+/* Shared route layout: keep every authenticated page aligned to the same
+   readable width and prevent long user content from widening the viewport. */
+.page-container > *,
+.page-header > *,
+.page-actions > * {
+  min-width: 0;
+}
+
+.page-header {
+  width: 100%;
+}
+
+.page-header h1,
+.page-header p,
+.section-title,
+.section-subtitle {
+  overflow-wrap: anywhere;
+}
+
+.card,
+.stat-card,
+.alert-banner {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.page-actions > a,
+.page-actions > button {
+  min-height: 42px;
+}
+
 
 /* ===========================
    BADGES / STATUS
@@ -483,6 +515,26 @@ body {
   .data-table { font-size: 13px; }
   .data-table th,
   .data-table td { padding: 10px 12px; }
+}
+
+@media (max-width: 480px) {
+  .data-table {
+    min-width: 460px;
+    font-size: 12px;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 9px 10px;
+  }
+
+  .form-label {
+    font-size: 13px;
+  }
+
+  .form-select {
+    font-size: 14px;
+  }
 }
 
 
@@ -652,7 +704,10 @@ body {
 
 @media (max-width: 768px) {
   .page-header { flex-direction: column; }
-  .page-actions { width: 100%; }
+  .page-actions {
+    width: 100%;
+    gap: 10px;
+  }
 
   .page-container {
     gap: 16px;
@@ -665,6 +720,8 @@ body {
   .page-actions > a,
   .page-actions > button {
     min-height: 44px;
+    flex: 1 1 auto;
+    justify-content: center;
   }
 
   .stat-grid {
@@ -694,6 +751,24 @@ body {
 
   .content {
     padding: 16px 12px;
+  }
+
+  .page-container {
+    gap: 14px;
+  }
+
+  .card {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .page-actions {
+    flex-direction: column;
+  }
+
+  .page-actions > a,
+  .page-actions > button {
+    width: 100%;
   }
 
   .page-header h1 {

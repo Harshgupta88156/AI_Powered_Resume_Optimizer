@@ -1,5 +1,5 @@
 .footer {
-  background: #0f172a;
+  background: var(--sidebar-bg);
   color: white;
 }
 

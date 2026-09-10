@@ -120,10 +120,17 @@
 }
 
 @media (max-width: 768px) {
-  .header { padding: 0 14px; }
+  .header {
+    padding: 0 14px;
+    gap: 8px;
+  }
   .menu-btn { display: flex; }
   .user-info { display: none; }
   .logo { font-size: 17px; }
+  .header-right,
+  .user {
+    gap: 8px;
+  }
 }
 
 @media (max-width: 520px) {

@@ -5,9 +5,9 @@
 
 .heading {
   text-align: center;
-  max-width:auto;
+  max-width: 760px;
   margin: 0 auto 70px;
-  line-height: 40px;
+  line-height: 1.4;
 }
 
 .section-title {
@@ -31,13 +31,15 @@
   color: var(--secondary);
   line-height: 1.8;
   font-size: 17px;
-  margin-top:10px
+  margin-top: 10px;
 }
 
 .feature-grid {
   display: grid;
   grid-template-columns: repeat(4,1fr);
   gap: 28px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .feature-card {
@@ -87,18 +89,33 @@
 @media(max-width:768px) {
 
   .features {
-    padding: 80px 6%;
+    padding: 68px 20px;
   }
 
   .heading h2 {
-    font-size: 34px;
+    font-size: clamp(30px, 8vw, 34px);
+  }
+
+  .heading {
+    margin-bottom: 42px;
   }
 
   .feature-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
 
   .feature-card {
-    padding: 28px;
+    padding: 24px;
+  }
+
+  @media(max-width:480px) {
+    .features {
+      padding: 60px 12px;
+    }
+
+    .feature-card {
+      padding: 20px;
+    }
   }
 }

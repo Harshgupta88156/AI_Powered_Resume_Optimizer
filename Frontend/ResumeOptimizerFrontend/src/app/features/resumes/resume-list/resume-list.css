@@ -4,7 +4,7 @@
 
 .resume-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
   gap: 18px;
 }
 
@@ -50,13 +50,22 @@
 }
 
 .resume-name {
-  /*font-size: 15px;*/
+  width: 100%;
+  max-width: 100%;
+  font-size: 15px;
   font-weight: 700;
   color: var(--text);
   text-overflow:ellipsis;
   padding-right: 8px;
-  white-space: wrap;
   overflow:hidden;
+  white-space:nowrap;
+}
+
+@media (max-width: 480px) {
+  .resume-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
 }
 
 .resume-meta {
@@ -88,4 +97,3 @@
   font-size: 14px;
   color: var(--secondary);
 }
-

@@ -1,20 +1,24 @@
 .hero {
   width: 100%;
   min-height: calc(100vh - 80px);
+  max-width: 1440px;
+  margin: 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 80px;
-  padding: 80px 8%;
+  gap: clamp(40px, 6vw, 96px);
+  padding: clamp(56px, 7vw, 96px) clamp(24px, 7vw, 112px);
   background: var(--background);
 }
 
 .hero-left {
   flex: 1;
+  min-width: 0;
 }
 
 .hero-right {
   flex: 1;
+  min-width: 0;
   display: flex;
   justify-content: flex-end;
 }
@@ -42,7 +46,7 @@
   color: var(--secondary);
   font-size: 18px;
   line-height: 1.8;
-  max-width: 650px;
+  max-width: 620px;
   margin-bottom: 35px;
 }
 
@@ -101,6 +105,7 @@
 
 .analysis-card {
   width: 470px;
+  max-width: 100%;
   background: var(--surface);
   border-radius: 18px;
   border: 1px solid var(--border);
@@ -202,9 +207,16 @@
   .hero {
     flex-direction: column;
     text-align: center;
+    min-height: auto;
+    padding-inline: 6%;
   }
 
   .hero-right {
+    width: min(100%, 760px);
+  }
+
+  .hero-right {
+    width: min(100%, 560px);
     justify-content: center;
   }
 
@@ -223,26 +235,91 @@
 }
 
 @media(max-width:768px) {
+  .hero {
+    gap: 42px;
+    padding: 52px 20px 68px;
+  }
+
+  .badge {
+    margin-bottom: 20px;
+    font-size: 13px;
+  }
 
   .hero h1 {
-    font-size: 42px;
+    font-size: clamp(34px, 10vw, 42px);
+    line-height: 1.12;
+    margin-bottom: 18px;
   }
 
   .hero p {
     font-size: 16px;
+    line-height: 1.65;
+    margin-bottom: 26px;
   }
 
   .hero-stats {
-    flex-direction: column;
-    gap: 25px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
   }
 
   .buttons {
     flex-direction: column;
+    gap: 12px;
+    margin-bottom: 42px;
   }
 
   .primary-btn,
   .secondary-btn {
     width: 100%;
+  }
+
+  .stat h2 {
+    font-size: 26px;
+  }
+
+  .stat span {
+    font-size: 12px;
+  }
+
+  .analysis-card {
+    padding: 22px;
+    border-radius: 14px;
+  }
+
+  .card-header {
+    margin-bottom: 24px;
+  }
+
+  .card-header h3 {
+    font-size: 20px;
+  }
+}
+
+@media(max-width:480px) {
+  .hero {
+    padding-inline: 14px;
+  }
+
+  .hero h1 {
+    font-size: 32px;
+    line-height: 1.2;
+  }
+
+  .hero p {
+    font-size: 14px;
+  }
+
+  .badge {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .analysis-card {
+    padding: 18px;
+  }
+
+  .recommendations li {
+    overflow-wrap: anywhere;
   }
 }
