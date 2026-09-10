@@ -1,0 +1,39 @@
+<header class="header">
+
+  <div class="header-left">
+    <button
+      type="button"
+      class="menu-btn"
+      (click)="toggleMenu()"
+      aria-label="Toggle navigation menu">
+      <span></span><span></span><span></span>
+    </button>
+
+    <a routerLink="/" class="logo" title="Go to homepage">Resume Optimizer</a>
+  </div>
+
+  <div class="header-right">
+
+    <app-theme-toggle></app-theme-toggle>
+
+    <div class="user" *ngIf="currentUser() as user">
+      <a routerLink="/profile" class="user-identity" title="View profile">
+        <span class="user-avatar">{{ initials }}</span>
+        <span class="user-info">
+          <span class="user-name">{{ user.name }}</span>
+          <span class="user-email">{{ user.email }}</span>
+        </span>
+      </a>
+
+      <button
+        type="button"
+        class="logout-btn"
+        (click)="logout()"
+        [disabled]="loggingOut()">
+        {{ loggingOut() ? 'Signing out...' : 'Log out' }}
+      </button>
+    </div>
+
+  </div>
+
+</header>

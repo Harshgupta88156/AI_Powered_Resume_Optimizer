@@ -1,0 +1,9 @@
+{
+  "analysisId": 1,
+  "resumeText": "John Doe\nSoftware Engineer with 3 years experience.\nSkills: Java, Spring Boot, SQL, Git, REST APIs.\nExperience: Software Engineer at XYZ Corp (2018-Present). Built backend services using Java and Spring Boot.\nEducation: B.S. in Computer Science, University of California, Los Angeles (2010-2014).",
+  "jobDescriptionText": "Hiring Backend Engineer. Requirements: Java, Spring Boot, Docker, Kubernetes, Kafka, microservices, CI/CD.",
+  "company": "TechCorp",
+  "jobTitle": "Backend Engineer",
+  "missingSkills": ["Docker", "Kubernetes", "Kafka", "CI/CD"],
+  "suggestedSkills": ["Microservices Architecture"]
+}

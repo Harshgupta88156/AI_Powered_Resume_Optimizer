@@ -1,0 +1,24 @@
+<div class="toast-stack">
+
+  <div
+    *ngFor="let toast of toastService.toasts()"
+    class="toast"
+    [ngClass]="'toast-' + toast.type"
+  >
+    <span class="toast-icon">
+      <ng-container [ngSwitch]="toast.type">
+        <ng-container *ngSwitchCase="'success'">&#10003;</ng-container>
+        <ng-container *ngSwitchCase="'error'">&#10005;</ng-container>
+        <ng-container *ngSwitchCase="'warning'">&#33;</ng-container>
+        <ng-container *ngSwitchDefault>&#8505;</ng-container>
+      </ng-container>
+    </span>
+
+    <span class="toast-text">{{ toast.text }}</span>
+
+    <button type="button" class="toast-close" (click)="dismiss(toast.id)">&times;</button>
+
+  </div>
+
+</div>
+

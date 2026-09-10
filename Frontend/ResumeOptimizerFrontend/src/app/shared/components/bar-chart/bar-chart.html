@@ -1,0 +1,23 @@
+<div class="bar-chart" *ngIf="hasData(); else empty">
+
+  <div class="bar-row" *ngFor="let bar of bars()">
+
+    <span class="bar-label" [title]="bar.label">{{ bar.label }}</span>
+
+    <span class="bar-track">
+      <span
+        class="bar-fill"
+        [style.width.%]="bar.percent"
+        role="img"
+        [attr.aria-label]="bar.label + ': ' + format(bar.count) + ' (' + bar.share + '%)'"></span>
+    </span>
+
+    <span class="bar-value">{{ format(bar.count) }}</span>
+
+  </div>
+
+</div>
+
+<ng-template #empty>
+  <p class="chart-empty">Not enough data yet.</p>
+</ng-template>

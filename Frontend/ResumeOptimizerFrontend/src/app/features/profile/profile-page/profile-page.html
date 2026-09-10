@@ -1,0 +1,412 @@
+<div class="page-container">
+
+  <div class="page-header">
+    <div>
+      <h1>Profile</h1>
+      <p>The details here feed straight into every tailored resume you generate.</p>
+    </div>
+  </div>
+
+  <app-spinner *ngIf="loading()" label="Loading profile..."></app-spinner>
+
+  <div class="alert-banner alert-error" *ngIf="!loading() && error()">
+    {{ error() }}
+  </div>
+
+  <ng-container *ngIf="!loading() && !error() && profile() as p">
+
+    <!-- Identity summary -->
+    <div class="card identity-card">
+      <div class="identity-avatar">{{ initials }}</div>
+
+      <div class="identity-body">
+        <h2>{{ p.name }}</h2>
+        <p class="identity-headline" *ngIf="p.headline">{{ p.headline }}</p>
+        <p class="identity-meta">{{ p.email }}</p>
+
+        <div class="identity-badges">
+          <span class="badge badge-info">{{ roleLabel }}</span>
+          <span class="badge badge-neutral">{{ providerLabel }}</span>
+          <span class="badge badge-neutral">Joined {{ p.createdAt | date:'mediumDate' }}</span>
+        </div>
+      </div>
+
+      <div class="completion">
+        <div class="completion-value">{{ completion() }}%</div>
+        <div class="completion-label">complete</div>
+        <div class="score-bar-track">
+          <div class="score-bar-fill" [style.width.%]="completion()"></div>
+        </div>
+      </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="save()">
+
+      <!-- Basics -->
+      <div class="card">
+        <div class="section-title">Basics</div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="name">Full name</label>
+            <input id="name" type="text" class="form-input" formControlName="name" />
+            <small class="form-error" *ngIf="form.controls.name.touched && form.controls.name.invalid">
+              Enter your name (120 characters max).
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="phone">Phone</label>
+            <input id="phone" type="tel" class="form-input" formControlName="phone" placeholder="+91 98765 43210" />
+            <small class="form-error" *ngIf="form.controls.phone.touched && form.controls.phone.invalid">
+              Digits, spaces and + - ( ) only.
+            </small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="headline">Headline</label>
+          <input id="headline" type="text" class="form-input" formControlName="headline"
+                 placeholder="Backend engineer building distributed systems" />
+          <small class="form-hint">One line, the way you'd introduce yourself.</small>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="summary">Summary</label>
+          <textarea id="summary" class="form-textarea" formControlName="summary" rows="5"
+                    placeholder="A short paragraph about what you do and what you're looking for."></textarea>
+        </div>
+      </div>
+
+      <!-- Location -->
+      <div class="card">
+        <div class="section-title">Location</div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="city">City</label>
+            <input id="city" type="text" class="form-input" formControlName="city" placeholder="Mumbai" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="country">Country</label>
+            <input id="country" type="text" class="form-input" formControlName="country" placeholder="India" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="location">Full location line</label>
+          <input id="location" type="text" class="form-input" formControlName="location"
+                 placeholder="Mumbai, Maharashtra, India" />
+          <small class="form-hint">This is what appears on the generated resume.</small>
+        </div>
+
+        <label class="checkbox-row">
+          <input type="checkbox" formControlName="openToRelocation" />
+          <span>Open to relocating</span>
+        </label>
+      </div>
+
+      <!-- Current role -->
+      <div class="card">
+        <div class="section-title">Current role</div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="currentTitle">Job title</label>
+            <input id="currentTitle" type="text" class="form-input" formControlName="currentTitle" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="currentCompany">Company</label>
+            <input id="currentCompany" type="text" class="form-input" formControlName="currentCompany" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="totalExperienceYears">Years of experience</label>
+            <input id="totalExperienceYears" type="number" min="0" max="60" step="0.5"
+                   class="form-input" formControlName="totalExperienceYears" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Links -->
+      <div class="card">
+        <div class="section-title">Links</div>
+        <p class="section-subtitle">Paste the full address, or just the domain — we'll add https:// for you.</p>
+
+        <div class="form-grid" style="margin-top:14px;">
+          <div class="form-group">
+            <label class="form-label" for="linkedinUrl">LinkedIn</label>
+            <input id="linkedinUrl" type="url" class="form-input" formControlName="linkedinUrl"
+                   placeholder="linkedin.com/in/your-handle" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="githubUrl">GitHub</label>
+            <input id="githubUrl" type="url" class="form-input" formControlName="githubUrl"
+                   placeholder="github.com/your-handle" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="portfolioUrl">Portfolio</label>
+            <input id="portfolioUrl" type="url" class="form-input" formControlName="portfolioUrl" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="leetcodeUrl">LeetCode</label>
+            <input id="leetcodeUrl" type="url" class="form-input" formControlName="leetcodeUrl" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="twitterUrl">X / Twitter</label>
+            <input id="twitterUrl" type="url" class="form-input" formControlName="twitterUrl" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Skills -->
+      <div class="card">
+        <div class="section-title">Skills</div>
+
+        <div class="form-group">
+          <label class="form-label" for="skills">Your skills</label>
+          <textarea id="skills" class="form-textarea" rows="3"
+                    [value]="skillsInput()"
+                    (input)="onSkillsInput($any($event.target).value)"
+                    placeholder="Java, Spring Boot, PostgreSQL, Docker, Kubernetes"></textarea>
+          <small class="form-hint">Separate with commas. Duplicates are removed automatically.</small>
+        </div>
+
+        <div class="skill-tags" *ngIf="parsedSkills.length">
+          <span class="badge badge-info" *ngFor="let skill of parsedSkills">{{ skill }}</span>
+        </div>
+      </div>
+
+      <!-- Experience -->
+      <div class="card">
+        <div class="section-title-row">
+          <div>
+            <div class="section-title">Work experience</div>
+            <p class="section-subtitle">Most recent first.</p>
+          </div>
+          <button type="button" class="btn-outline btn-sm" (click)="addExperience()">Add role</button>
+        </div>
+
+        <p class="form-hint" *ngIf="!experiences.length">No roles added yet.</p>
+
+        <div class="repeat-row" formArrayName="experiences"
+             *ngFor="let group of experiences.controls; let i = index">
+          <div [formGroupName]="i">
+
+            <div class="repeat-head">
+              <span class="repeat-index">Role {{ i + 1 }}</span>
+              <button type="button" class="btn-ghost btn-sm" (click)="removeExperience(i)">Remove</button>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Job title</label>
+                <input type="text" class="form-input" formControlName="jobTitle" />
+                <small class="form-error"
+                       *ngIf="group.get('jobTitle')?.touched && group.get('jobTitle')?.invalid">
+                  Job title is required.
+                </small>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Company</label>
+                <input type="text" class="form-input" formControlName="company" />
+                <small class="form-error"
+                       *ngIf="group.get('company')?.touched && group.get('company')?.invalid">
+                  Company is required.
+                </small>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Location</label>
+                <input type="text" class="form-input" formControlName="location" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Employment type</label>
+                <select class="form-select" formControlName="employmentType">
+                  <option *ngFor="let type of employmentTypes" [value]="type">{{ labelFor(type) }}</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Start date</label>
+                <input type="date" class="form-input" formControlName="startDate" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">End date</label>
+                <input type="date" class="form-input" formControlName="endDate" />
+              </div>
+            </div>
+
+            <label class="checkbox-row">
+              <input type="checkbox" formControlName="currentRole" />
+              <span>I currently work here</span>
+            </label>
+
+            <div class="form-group">
+              <label class="form-label">What you did</label>
+              <textarea class="form-textarea" rows="3" formControlName="description"
+                        placeholder="One bullet per line. Lead with impact and numbers."></textarea>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Education -->
+      <div class="card">
+        <div class="section-title-row">
+          <div>
+            <div class="section-title">Education</div>
+            <p class="section-subtitle">College, university, or bootcamp.</p>
+          </div>
+          <button type="button" class="btn-outline btn-sm" (click)="addEducation()">Add education</button>
+        </div>
+
+        <p class="form-hint" *ngIf="!educations.length">No education added yet.</p>
+
+        <div class="repeat-row" formArrayName="educations"
+             *ngFor="let group of educations.controls; let i = index">
+          <div [formGroupName]="i">
+
+            <div class="repeat-head">
+              <span class="repeat-index">Education {{ i + 1 }}</span>
+              <button type="button" class="btn-ghost btn-sm" (click)="removeEducation(i)">Remove</button>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">College / university</label>
+                <input type="text" class="form-input" formControlName="institution" />
+                <small class="form-error"
+                       *ngIf="group.get('institution')?.touched && group.get('institution')?.invalid">
+                  Institution name is required.
+                </small>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Degree</label>
+                <input type="text" class="form-input" formControlName="degree" placeholder="B.Tech" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Field of study</label>
+                <input type="text" class="form-input" formControlName="fieldOfStudy"
+                       placeholder="Computer Science" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Location</label>
+                <input type="text" class="form-input" formControlName="location" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Start year</label>
+                <input type="number" min="1900" max="2100" class="form-input" formControlName="startYear" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">End year</label>
+                <input type="number" min="1900" max="2100" class="form-input" formControlName="endYear" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Grade</label>
+                <input type="text" class="form-input" formControlName="grade" placeholder="8.4 CGPA" />
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Certificates -->
+      <div class="card">
+        <div class="section-title-row">
+          <div>
+            <div class="section-title">Certificates</div>
+            <p class="section-subtitle">Credentials worth putting in front of a recruiter.</p>
+          </div>
+          <button type="button" class="btn-outline btn-sm" (click)="addCertification()">Add certificate</button>
+        </div>
+
+        <p class="form-hint" *ngIf="!certifications.length">No certificates added yet.</p>
+
+        <div class="repeat-row" formArrayName="certifications"
+             *ngFor="let group of certifications.controls; let i = index">
+          <div [formGroupName]="i">
+
+            <div class="repeat-head">
+              <span class="repeat-index">Certificate {{ i + 1 }}</span>
+              <button type="button" class="btn-ghost btn-sm" (click)="removeCertification(i)">Remove</button>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Name</label>
+                <input type="text" class="form-input" formControlName="name"
+                       placeholder="AWS Certified Solutions Architect" />
+                <small class="form-error"
+                       *ngIf="group.get('name')?.touched && group.get('name')?.invalid">
+                  Certificate name is required.
+                </small>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Issued by</label>
+                <input type="text" class="form-input" formControlName="issuingOrganization" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Credential ID</label>
+                <input type="text" class="form-input" formControlName="credentialId" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Credential URL</label>
+                <input type="url" class="form-input" formControlName="credentialUrl" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Issued on</label>
+                <input type="date" class="form-input" formControlName="issueDate" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Expires on</label>
+                <input type="date" class="form-input" formControlName="expiryDate" />
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Save bar -->
+      <div class="save-bar">
+        <span class="save-hint" *ngIf="form.dirty">You have unsaved changes.</span>
+
+        <div class="page-actions">
+          <button type="button" class="btn-ghost btn-sm" (click)="reset()"
+                  [disabled]="saving() || !form.dirty">
+            Discard
+          </button>
+          <button type="submit" class="btn-primary btn-sm" [disabled]="saving()">
+            {{ saving() ? 'Saving...' : 'Save profile' }}
+          </button>
+        </div>
+      </div>
+
+    </form>
+
+  </ng-container>
+
+</div>

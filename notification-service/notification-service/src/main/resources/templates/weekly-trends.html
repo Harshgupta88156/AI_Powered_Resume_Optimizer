@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Your weekly resume trends</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f4f5f7;font-family:Arial,Helvetica,sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f5f7;padding:32px 0;">
+    <tr>
+        <td align="center">
+            <table role="presentation" width="520" cellpadding="0" cellspacing="0"
+                   style="background-color:#ffffff;border-radius:8px;overflow:hidden;">
+                <tr>
+                    <td style="background-color:#7c3aed;padding:24px 32px;">
+                        <h1 style="color:#ffffff;margin:0;font-size:22px;">Weekly Trends</h1>
+                        <p style="color:#ede9fe;margin:4px 0 0;font-size:13px;" th:text="${weekRangeLabel}">This week</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:32px;">
+                        <h3 style="color:#111827;">Trending Skills</h3>
+                        <ul style="color:#374151;font-size:14px;line-height:1.8;padding-left:20px;">
+                            <li th:each="skill : ${trendingSkills}" th:text="${skill}">Skill</li>
+                        </ul>
+
+                        <h3 style="color:#111827;">Most Analyzed Job Roles</h3>
+                        <ul style="color:#374151;font-size:14px;line-height:1.8;padding-left:20px;">
+                            <li th:each="role : ${mostAnalyzedJobRoles}" th:text="${role}">Role</li>
+                        </ul>
+
+                        <h3 style="color:#111827;">ATS Improvements</h3>
+                        <ul style="color:#374151;font-size:14px;line-height:1.8;padding-left:20px;">
+                            <li th:each="item : ${atsImprovements}" th:text="${item}">Improvement</li>
+                        </ul>
+
+                        <h3 style="color:#111827;">Weekly Insights</h3>
+                        <ul style="color:#374151;font-size:14px;line-height:1.8;padding-left:20px;">
+                            <li th:each="insight : ${weeklyInsights}" th:text="${insight}">Insight</li>
+                        </ul>
+
+                        <table role="presentation" cellpadding="0" cellspacing="0" style="margin:24px 0;">
+                            <tr>
+                                <td style="border-radius:6px;background-color:#7c3aed;">
+                                    <a th:href="${dashboardUrl}"
+                                       style="display:inline-block;padding:12px 24px;color:#ffffff;text-decoration:none;font-weight:bold;font-size:14px;">
+                                        Open Dashboard
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>
+

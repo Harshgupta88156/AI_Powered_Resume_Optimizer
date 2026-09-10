@@ -1,0 +1,303 @@
+
+  /* =========================================================
+     GLOBAL TRENDS
+  ========================================================= */
+
+.trends-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 28px 32px 50px;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.page-header {
+  margin-bottom: 26px;
+}
+
+.page-header h1 {
+  margin: 0 0 5px;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.page-header p {
+  margin: 0;
+  color: var(--secondary);
+  font-size: 13px;
+}
+
+
+/* =========================================================
+   SNAPSHOT
+========================================================= */
+
+.snapshot {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  margin-bottom: 32px;
+}
+
+.snapshot-item {
+  min-width: 0;
+  padding: 18px 20px;
+  border-right: 1px solid var(--border);
+}
+
+.snapshot-item:last-child {
+  border-right: none;
+}
+
+.snapshot-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--secondary);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+.snapshot-item strong {
+  display: block;
+  overflow: hidden;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.snapshot-item small {
+  display: block;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+
+/* =========================================================
+   SECTIONS
+========================================================= */
+
+.trend-section {
+  margin-bottom: 30px;
+}
+
+.section-header {
+  margin-bottom: 10px;
+}
+
+.section-header h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.section-header p {
+  margin: 4px 0 0;
+  color: var(--secondary);
+  font-size: 12px;
+}
+
+.section-header.compact {
+  margin-bottom: 10px;
+}
+
+
+/* =========================================================
+   SKILLS + TECHNOLOGIES
+========================================================= */
+
+.trend-card {
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.trend-column {
+  min-width: 0;
+}
+
+.trend-divider {
+  background: var(--border);
+}
+
+.column-title {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  color: var(--secondary);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.rank-list {
+  padding: 2px 18px 8px;
+}
+
+.rank-row,
+.simple-row,
+.gap-row {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  gap: 10px;
+  border-bottom: 1px solid var(--surface-alt);
+}
+
+.rank-row:last-child,
+.simple-row:last-child,
+.gap-row:last-child {
+  border-bottom: none;
+}
+
+.rank-number {
+  width: 20px;
+  flex: 0 0 20px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.rank-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rank-count {
+  flex: 0 0 auto;
+  color: var(--secondary);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   SIMPLE CARD
+========================================================= */
+
+.simple-card {
+  padding: 2px 18px 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+
+/* =========================================================
+   MARKET GAPS
+========================================================= */
+
+.gap-row {
+  min-height: 42px;
+}
+
+.gap-row .rank-name {
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   ROLES + COMPANIES
+========================================================= */
+
+.two-column {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+  .snapshot {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .snapshot-item:nth-child(2) {
+    border-right: none;
+  }
+
+  .snapshot-item:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .trend-card {
+    grid-template-columns: 1fr;
+  }
+
+  .trend-divider {
+    width: 100%;
+    height: 1px;
+  }
+
+  .two-column {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+@media (max-width: 600px) {
+
+  .trends-page {
+    padding: 22px 16px 40px;
+  }
+
+  .snapshot {
+    grid-template-columns: 1fr;
+  }
+
+  .snapshot-item,
+  .snapshot-item:nth-child(2) {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .snapshot-item:last-child {
+    border-bottom: none;
+  }
+
+}
+
+
+/* ===========================
+   CHARTS
+=========================== */
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.chart-card {
+  padding: 20px 22px;
+}
+
+.gap-chart {
+  margin-bottom: 16px;
+}
+
+@media (max-width: 640px) {
+  .chart-grid { grid-template-columns: 1fr; }
+  .chart-card { padding: 16px; }
+}

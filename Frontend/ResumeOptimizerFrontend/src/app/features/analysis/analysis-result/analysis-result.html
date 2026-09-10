@@ -1,0 +1,289 @@
+<div class="page-container">
+
+  <a routerLink="/analysis" class="back-link">&larr; Back to analysis</a>
+
+  <app-spinner *ngIf="loading()" label="Loading analysis..."></app-spinner>
+
+  <div class="alert-banner alert-error" *ngIf="!loading() && error()">
+    {{ error() }}
+  </div>
+
+  <ng-container *ngIf="!loading() && !error() && analysis() as a">
+
+    <div class="page-header">
+      <div>
+        <h1>{{ a.resumeDisplayName }} &rarr; {{ a.jobTitle || 'Untitled Role' }}</h1>
+        <p>{{ a.company }} &middot; Analyzed {{ a.createdAt | date:'medium' }}</p>
+      </div>
+      <div class="page-actions">
+        <span class="badge" [ngClass]="statusClass(a.status)">{{ a.status }}</span>
+      </div>
+    </div>
+
+    <div class="alert-banner alert-error" *ngIf="a.status === 'FAILED'">
+      Analysis failed: {{ a.errorMessage || 'Unknown error occurred.' }}
+    </div>
+
+    <ng-container *ngIf="a.status === 'COMPLETED'">
+
+      <div class="score-grid">
+        <div class="card score-card">
+          <div class="score-label">ATS Score</div>
+          <div class="score-value">{{ a.atsScore }}<span class="score-max">/100</span></div>
+          <div class="score-bar-track">
+            <div class="score-bar-fill" [style.width.%]="a.atsScore" [ngClass]="scoreClass(a.atsScore)"></div>
+          </div>
+        </div>
+
+        <div class="card score-card">
+          <div class="score-label">Match Score</div>
+          <div class="score-value">{{ a.matchScore }}<span class="score-max">/100</span></div>
+          <div class="score-bar-track">
+            <div class="score-bar-fill" [style.width.%]="a.matchScore" [ngClass]="scoreClass(a.matchScore)"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" *ngIf="a.overallSummary">
+        <div class="section-title">Summary</div>
+        <p class="summary-text">{{ a.overallSummary }}</p>
+      </div>
+
+      <div class="report-grid">
+
+        <div class="card" *ngIf="a.matchingSkills.length">
+          <div class="section-title">Matching Skills</div>
+          <div class="skill-tags">
+            <span class="badge badge-success" *ngFor="let s of a.matchingSkills">{{ s }}</span>
+          </div>
+        </div>
+
+        <div class="card" *ngIf="a.missingSkills.length">
+          <div class="section-title">Missing Skills</div>
+          <div class="skill-tags">
+            <span class="badge badge-danger" *ngFor="let s of a.missingSkills">{{ s }}</span>
+          </div>
+        </div>
+
+        <div class="card" *ngIf="a.suggestedSkills.length">
+          <div class="section-title">Suggested Skills to Add</div>
+          <div class="skill-tags">
+            <span class="badge badge-info" *ngFor="let s of a.suggestedSkills">{{ s }}</span>
+          </div>
+        </div>
+
+        <div class="card" *ngIf="a.strengths.length">
+          <div class="section-title">Strengths</div>
+          <ul class="bullet-list">
+            <li *ngFor="let s of a.strengths">{{ s }}</li>
+          </ul>
+        </div>
+
+        <div class="card" *ngIf="a.weaknesses.length">
+          <div class="section-title">Weaknesses</div>
+          <ul class="bullet-list">
+            <li *ngFor="let s of a.weaknesses">{{ s }}</li>
+          </ul>
+        </div>
+
+        <div class="card" *ngIf="a.suggestions.length">
+          <div class="section-title">Suggestions</div>
+          <ul class="bullet-list">
+            <li *ngFor="let s of a.suggestions">{{ s }}</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="card learning-card" *ngIf="learningResourceGroups.length || learningLoading()">
+        <div class="section-title-row">
+          <div>
+            <div class="section-title">Recommended Learning Resources</div>
+            <p class="section-subtitle">
+              Based on your missing and suggested skills, these playlists, docs, and courses can help you close the gap for this JD.
+            </p>
+          </div>
+        </div>
+
+        <app-spinner *ngIf="learningLoading()" label="Finding resources for your skill gaps..."></app-spinner>
+
+        <div class="learning-summary" *ngIf="!learningLoading()">
+          <div class="learning-summary-item">
+            <strong>{{ learningResources().length }}</strong>
+            <span>Top resources</span>
+          </div>
+          <div class="learning-summary-item">
+            <strong>{{ learningResourceGroups.length }}</strong>
+            <span>Skill categories</span>
+          </div>
+          <div class="learning-summary-item">
+            <strong>{{ coveredLearningSkillCount }}</strong>
+            <span>Priority skills covered</span>
+          </div>
+        </div>
+
+        <div class="learning-category" *ngFor="let group of learningResourceGroups" [hidden]="learningLoading()">
+          <div class="learning-category-title">{{ group.category }}</div>
+
+          <div class="learning-grid">
+            <a
+              class="learning-resource"
+              *ngFor="let resource of group.resources"
+              [href]="resource.url"
+              target="_blank"
+              rel="noopener noreferrer">
+
+              <div class="learning-resource-header">
+                <span class="badge badge-info">{{ resource.skill }}</span>
+                <span class="learning-platform">{{ resource.provider }}</span>
+              </div>
+
+              <h3>{{ resource.title }}</h3>
+              <p>{{ resource.description }}</p>
+
+              <div class="learning-tags">
+                <span class="learning-tag">{{ formatType(resource.resourceType) }}</span>
+                <span class="learning-tag">{{ formatType(resource.level) }}</span>
+                <span class="learning-tag" *ngIf="formatHours(resource.estimatedHours)">
+                  {{ formatHours(resource.estimatedHours) }}
+                </span>
+                <span class="learning-tag learning-tag-free" *ngIf="resource.free">Free</span>
+              </div>
+
+              <div class="learning-resource-footer">
+                <span class="learning-link">Start learning &rarr;</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title-row">
+          <div>
+            <div class="section-title">Resume tailored to this job</div>
+            <p class="section-subtitle">
+              Rewritten around the skills this analysis flagged. Download it, review every line, then send it.
+            </p>
+          </div>
+
+          <div class="page-actions">
+
+            <button
+              type="button"
+              class="btn-primary btn-sm"
+              (click)="generateMarkdown(false)"
+              [disabled]="generatingMarkdown() || loadingCachedMarkdown()"
+              *ngIf="!markdown()">
+              {{ generatingMarkdown() ? 'Generating...' : 'Generate tailored resume' }}
+            </button>
+
+            <ng-container *ngIf="markdown()">
+
+              <button
+                type="button"
+                class="btn-primary btn-sm"
+                (click)="downloadMarkdown()"
+                [disabled]="downloading()">
+                Download .md
+              </button>
+
+              <button
+                type="button"
+                class="btn-outline btn-sm"
+                (click)="printMarkdownAsPdf()">
+                Save as PDF
+              </button>
+
+              <button
+                type="button"
+                class="btn-ghost btn-sm"
+                (click)="downloadHtml()">
+                Download .html
+              </button>
+
+              <button
+                type="button"
+                class="btn-ghost btn-sm"
+                (click)="copyMarkdown()">
+                Copy
+              </button>
+
+              <button
+                type="button"
+                class="btn-ghost btn-sm"
+                (click)="generateMarkdown(true)"
+                [disabled]="generatingMarkdown()">
+                {{ generatingMarkdown() ? 'Regenerating...' : 'Regenerate' }}
+              </button>
+
+            </ng-container>
+
+          </div>
+        </div>
+
+        <app-spinner
+          *ngIf="generatingMarkdown() || loadingCachedMarkdown()"
+          [label]="generatingMarkdown() ? 'Writing your tailored resume...' : 'Loading saved resume...'">
+        </app-spinner>
+
+        <p class="form-hint" *ngIf="!markdown() && !generatingMarkdown() && !loadingCachedMarkdown()">
+          Nothing generated yet. Generating takes about a minute while the model rewrites your resume.
+        </p>
+
+        <ng-container *ngIf="markdown() && !generatingMarkdown()">
+
+          <div class="view-switch" role="tablist" aria-label="Resume view">
+            <button
+              type="button"
+              role="tab"
+              [attr.aria-selected]="view() === 'preview'"
+              [class.active]="view() === 'preview'"
+              (click)="setView('preview')">
+              Preview
+            </button>
+            <button
+              type="button"
+              role="tab"
+              [attr.aria-selected]="view() === 'edit'"
+              [class.active]="view() === 'edit'"
+              (click)="setView('edit')">
+              Edit
+            </button>
+            <button
+              type="button"
+              role="tab"
+              [attr.aria-selected]="view() === 'source'"
+              [class.active]="view() === 'source'"
+              (click)="setView('source')">
+              Markdown
+            </button>
+          </div>
+
+          <div class="edit-hint" *ngIf="view() === 'edit'">
+            Edit the markdown below. Changes are reflected in Preview and downloads instantly.
+            <span class="unsaved-badge" *ngIf="hasUnsavedEdits()">Edited</span>
+          </div>
+
+          <textarea
+            *ngIf="view() === 'edit'"
+            class="markdown-editor"
+            [value]="markdown() ?? ''"
+            (input)="onMarkdownEdit($event)"
+            spellcheck="false"
+            placeholder="Edit your resume markdown here..."></textarea>
+
+          <app-resume-preview
+            *ngIf="view() === 'preview'"
+            [markdown]="markdown()"></app-resume-preview>
+
+          <pre class="markdown-output" *ngIf="view() === 'source'">{{ markdown() }}</pre>
+
+        </ng-container>
+      </div>
+
+    </ng-container>
+
+  </ng-container>
+
+</div>

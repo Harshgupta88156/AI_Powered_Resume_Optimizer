@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Gradle Imported" enabled="true">
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.46/a5cfe99fdf320e84955ef653f2ce1bf789d11385/lombok-1.18.46.jar" />
+        </processorPath>
+        <module name="user-service.test" />
+        <module name="user-service.main" />
+      </profile>
+    </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="ai-service" options="-parameters" />
+      <module name="ai-service.main" options="-parameters" />
+      <module name="ai-service.test" options="-parameters" />
+      <module name="api-gateway-service" options="-parameters" />
+      <module name="api-gateway-service.main" options="-parameters" />
+      <module name="api-gateway-service.test" options="-parameters" />
+      <module name="dashboard-service" options="-parameters" />
+      <module name="dashboard-service.main" options="-parameters" />
+      <module name="dashboard-service.test" options="-parameters" />
+      <module name="eureka-server-service" options="-parameters" />
+      <module name="eureka-server-service.main" options="-parameters" />
+      <module name="eureka-server-service.test" options="-parameters" />
+      <module name="history-service" options="-parameters" />
+      <module name="history-service.main" options="-parameters" />
+      <module name="history-service.test" options="-parameters" />
+      <module name="notification-service" options="-parameters" />
+      <module name="notification-service.main" options="-parameters" />
+      <module name="notification-service.test" options="-parameters" />
+      <module name="resume-optimizer" options="-parameters" />
+      <module name="resume-optimizer.main" options="-parameters" />
+      <module name="resume-optimizer.test" options="-parameters" />
+      <module name="resume-service" options="-parameters" />
+      <module name="resume-service.main" options="-parameters" />
+      <module name="resume-service.test" options="-parameters" />
+      <module name="trends-service" options="-parameters" />
+      <module name="trends-service.main" options="-parameters" />
+      <module name="trends-service.test" options="-parameters" />
+      <module name="user-service" options="-parameters" />
+      <module name="user-service.main" options="-parameters" />
+      <module name="user-service.test" options="-parameters" />
+    </option>
+  </component>
+</project>

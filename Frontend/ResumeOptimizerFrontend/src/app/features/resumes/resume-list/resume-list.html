@@ -1,0 +1,94 @@
+<div class="page-container">
+
+  <div class="page-header">
+    <div>
+      <h1>Resumes</h1>
+      <p>Upload and manage your resume versions.</p>
+    </div>
+    <div class="page-actions">
+      <button type="button" class="btn-primary" (click)="toggleUploadForm()">
+        {{ showUploadForm() ? 'Cancel' : '+ Upload Resume' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="card upload-card" *ngIf="showUploadForm()">
+    <div class="section-title">Upload a new resume</div>
+
+    <div class="form-group">
+      <label class="form-label">Resume file (PDF, DOC, DOCX)</label>
+      <input type="file" class="form-input" accept=".pdf,.doc,.docx" (change)="onFileSelected($event)" />
+      <span class="form-error" *ngIf="fileError()">{{ fileError() }}</span>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Display name</label>
+      <input
+        type="text"
+        class="form-input"
+        placeholder="e.g. Senior Backend Engineer Resume"
+        [value]="displayNameInput()"
+        (input)="displayNameInput.set($any($event.target).value)"
+      />
+    </div>
+
+    <div class="page-actions">
+      <button type="button" class="btn-primary" (click)="upload()" [disabled]="uploading()">
+        {{ uploading() ? 'Uploading...' : 'Upload' }}
+      </button>
+      <button type="button" class="btn-ghost" (click)="toggleUploadForm()">Cancel</button>
+    </div>
+  </div>
+
+  <app-spinner *ngIf="loading()" label="Loading resumes..."></app-spinner>
+
+  <div class="alert-banner alert-error" *ngIf="!loading() && error()">
+    {{ error() }}
+  </div>
+
+  <div class="card" *ngIf="!loading() && !error() && resumes().length === 0">
+    <app-empty-state
+      title="No resumes uploaded yet"
+      message="Upload your first resume to start running ATS and job-match analyses."
+    >
+      <button type="button" class="btn-primary" (click)="toggleUploadForm()">Upload Resume</button>
+    </app-empty-state>
+  </div>
+
+  <div class="resume-grid" *ngIf="!loading() && !error() && resumes().length > 0">
+    <a
+      class="card resume-card"
+      *ngFor="let resume of resumes()"
+      [routerLink]="['/resumes', resume.resumeId]"
+    >
+      <div class="resume-card-header">
+        <span class="resume-icon">📄</span>
+        <button type="button" class="delete-btn" (click)="requestDelete(resume, $event)" title="Delete resume">&times;</button>
+      </div>
+      <p class="resume-name">{{ resume.displayName }}</p>
+      <p class="resume-meta">{{ resume.fileName }}</p>
+      <div class="resume-footer">
+        <span class="badge badge-info">v{{ resume.latestVersionNumber }}</span>
+        <span class="resume-date">{{ resume.updatedAt | date:'mediumDate' }}</span>
+      </div>
+    </a>
+  </div>
+
+  <app-pagination
+    [page]="page()"
+    [totalPages]="totalPages()"
+    [totalElements]="totalElements()"
+    [pageSize]="pageSize"
+    (pageChange)="goToPage($event)"></app-pagination>
+
+</div>
+
+<app-confirm-dialog
+  [open]="!!deleteTarget()"
+  title="Delete this resume?"
+  [message]="'This will permanently delete \'' + (deleteTarget()?.displayName ?? '') + '\' and all its versions. This cannot be undone.'"
+  confirmLabel="Delete"
+  (confirm)="confirmDelete()"
+  (cancel)="cancelDelete()"
+></app-confirm-dialog>
+

@@ -1,0 +1,387 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Inter,sans-serif;
+}
+
+.register-page {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 1.05fr .95fr;
+  overflow: hidden;
+  background: var(--background);
+}
+
+/* ================= LEFT PANEL ================= */
+.left-panel {
+  height: 100vh;
+  background: linear-gradient(135deg,#1e3a8a,#2563eb);
+  color: #ffffff;
+  overflow-y: auto;
+  padding: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.brand h1 {
+  font-size: 50px;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+.brand p {
+  max-width: 540px;
+  font-size: 17px;
+  line-height: 1.8;
+  color: rgba(255,255,255,.88);
+}
+
+.feature-list {
+  margin-top: 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+.icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.18);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.feature h4 {
+  margin-bottom: 8px;
+  font-size: 18px;
+}
+
+.feature p {
+  line-height: 1.6;
+  color: rgba(255,255,255,.82);
+  font-size: 15px;
+}
+
+/* ================= RIGHT PANEL ================= */
+
+.right-panel {
+  height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px;
+}
+
+.register-card {
+  width: 100%;
+  max-width: 520px;
+  margin: 30px 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 38px;
+  box-shadow: 0 20px 45px rgba(15,23,42,.08);
+}
+
+.card-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+  .card-header h2 {
+    font-size: 34px;
+    color: var(--text-strong);
+    margin-bottom: 8px;
+  }
+
+  .card-header p {
+    color: var(--secondary);
+  }
+
+/* ================= FORM ================= */
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .form-group input {
+    width: 100%;
+    height: 48px;
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    padding: 0 14px;
+    outline: none;
+    font-size: 15px;
+    transition: .25s;
+  }
+
+    .form-group input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+    }
+
+/* ================= PASSWORD ================= */
+
+.password-wrapper {
+  position: relative;
+}
+
+  .password-wrapper input {
+    padding-right: 72px;
+  }
+
+.eye-btn {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: none;
+  color: var(--primary);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+/* ================= PASSWORD STRENGTH ================= */
+
+.password-strength {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+
+  .password-strength span {
+    color: var(--secondary);
+  }
+
+  .password-strength strong {
+    font-weight: 700;
+  }
+
+  .password-strength .weak {
+    color: var(--danger);
+  }
+
+  .password-strength .medium {
+    color: var(--warning);
+  }
+
+  .password-strength .strong {
+    color: var(--success);
+  }
+
+/* ================= TERMS ================= */
+
+.terms {
+  margin: 18px 0 10px;
+}
+
+  .terms label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--secondary);
+    line-height: 1.5;
+  }
+
+  .terms input {
+    margin-top: 2px;
+    width: 16px;
+    height: 16px;
+  }
+
+/* ================= ERRORS ================= */
+
+.error {
+  display: block;
+  color: var(--danger);
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+.server-error {
+  margin: 18px 0;
+  background: var(--alert-error-bg);
+  border: 1px solid var(--alert-error-border);
+  color: var(--danger);
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+/* ================= REGISTER BUTTON ================= */
+
+.register-btn {
+  width: 100%;
+  height: 50px;
+  border: none;
+  border-radius: 10px;
+  background: var(--primary);
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: .25s;
+}
+
+  .register-btn:hover:not(:disabled) {
+    background: var(--primary-hover);
+  }
+
+  .register-btn:disabled {
+    opacity: .65;
+    cursor: not-allowed;
+  }
+
+/* ================= DIVIDER ================= */
+
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 26px 0;
+}
+
+  .divider::before,
+  .divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .divider span {
+    padding: 0 14px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+/* ================= GITHUB ================= */
+
+.github-btn {
+  width: 100%;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: .25s;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+  .github-btn:hover {
+    background: var(--background);
+    border-color: var(--muted);
+  }
+
+/* ================= LOGIN LINK ================= */
+
+.login-link {
+  text-align: center;
+  margin-top: 24px;
+  color: var(--secondary);
+  font-size: 14px;
+}
+
+  .login-link a {
+    margin-left: 5px;
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+    .login-link a:hover {
+      text-decoration: underline;
+    }
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:1100px) {
+
+  .register-page {
+    grid-template-columns: 1fr;
+  }
+
+  .left-panel {
+    display: none;
+  }
+
+  .right-panel {
+    padding: 24px;
+  }
+
+  .register-card {
+    max-width: 550px;
+  }
+}
+
+@media(max-width:768px) {
+
+  .right-panel {
+    padding: 18px;
+  }
+
+  .register-card {
+    padding: 28px;
+  }
+
+  .card-header h2 {
+    font-size: 28px;
+  }
+}
+
+@media(max-width:480px) {
+
+  .register-card {
+    padding: 22px;
+  }
+
+  .form-group input,
+  .register-btn,
+  .github-btn {
+    height: 46px;
+  }
+}
+
+
+/* ===========================
+   THEME TOGGLE SLOT
+=========================== */
+
+.theme-slot {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  z-index: 5;
+}

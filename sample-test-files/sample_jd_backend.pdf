@@ -1,0 +1,53 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /Resources << /Font << /F1 4 0 R >> >> /MediaBox [0 0 612 792] /Contents 5 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+5 0 obj
+<< /Length 1389 >>
+stream
+BT /F1 11 Tf 50 760 Td (Job Title: Backend Engineer) Tj ET
+BT /F1 11 Tf 50 744 Td (Company: Acme Corp) Tj ET
+BT /F1 11 Tf 50 728 Td () Tj ET
+BT /F1 11 Tf 50 712 Td (We are looking for a Backend Engineer to join our platform team.) Tj ET
+BT /F1 11 Tf 50 696 Td () Tj ET
+BT /F1 11 Tf 50 680 Td (REQUIRED SKILLS) Tj ET
+BT /F1 11 Tf 50 664 Td (- Strong knowledge of Java and Spring Boot) Tj ET
+BT /F1 11 Tf 50 648 Td (- Experience with microservices architecture) Tj ET
+BT /F1 11 Tf 50 632 Td (- Hands-on with PostgreSQL and database design) Tj ET
+BT /F1 11 Tf 50 616 Td (- Familiarity with Docker and containerization) Tj ET
+BT /F1 11 Tf 50 600 Td (- Solid understanding of Data Structures and Algorithms \(DSA\)) Tj ET
+BT /F1 11 Tf 50 584 Td (- Experience with Kafka or other messaging queues is a plus) Tj ET
+BT /F1 11 Tf 50 568 Td (- Working knowledge of AWS or cloud deployment) Tj ET
+BT /F1 11 Tf 50 552 Td () Tj ET
+BT /F1 11 Tf 50 536 Td (RESPONSIBILITIES) Tj ET
+BT /F1 11 Tf 50 520 Td (- Design and build scalable backend services) Tj ET
+BT /F1 11 Tf 50 504 Td (- Collaborate with frontend and DevOps teams) Tj ET
+BT /F1 11 Tf 50 488 Td (- Write clean, tested, maintainable code) Tj ET
+BT /F1 11 Tf 50 472 Td () Tj ET
+BT /F1 11 Tf 50 456 Td (NICE TO HAVE) Tj ET
+BT /F1 11 Tf 50 440 Td (- Experience with Redis caching) Tj ET
+BT /F1 11 Tf 50 424 Td (- Exposure to CI/CD pipelines) Tj ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000000311 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1752
+%%EOF

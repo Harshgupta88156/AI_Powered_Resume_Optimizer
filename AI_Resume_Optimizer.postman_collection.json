@@ -1,0 +1,613 @@
+{
+  "info": {
+    "name": "AI Resume Optimizer - Full E2E",
+    "_postman_id": "b3a9f1a0-0000-4000-8000-000000000001",
+    "description": "End-to-end collection for all 9 microservices. Requests are ordered top-to-bottom to form a working user journey: register -> login -> upload resume -> upload JD -> trigger analysis -> check history/dashboard/trends. All IDs/tokens are auto-captured into collection variables by each request's Test script, so you can just hit 'Send' down the list in order (or use Runner).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "accessToken", "value": "" },
+    { "key": "refreshToken", "value": "" },
+    { "key": "userId", "value": "" },
+    { "key": "userEmail", "value": "jane.doe@example.com" },
+    { "key": "userPassword", "value": "Passw0rd123" },
+    { "key": "resumeId", "value": "" },
+    { "key": "resumeVersionId", "value": "" },
+    { "key": "jobDescriptionId", "value": "" },
+    { "key": "analysisId", "value": "" },
+    { "key": "internalApiKey", "value": "CHANGE_ME_MATCH_ENV_VAR" }
+  ],
+  "item": [
+    {
+      "name": "01 - Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jane Doe\",\n  \"email\": \"{{userEmail}}\",\n  \"password\": \"{{userPassword}}\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api", "auth", "register"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('accessToken', json.accessToken);",
+                  "  pm.collectionVariables.set('refreshToken', json.refreshToken);",
+                  "  pm.collectionVariables.set('userId', json.userId);",
+                  "  console.log('Registered user id', json.userId);",
+                  "} else {",
+                  "  console.log('If 409/email exists, just run Login next instead.');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{userEmail}}\",\n  \"password\": \"{{userPassword}}\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Login 200', () => pm.response.code === 200);",
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('accessToken', json.accessToken);",
+                  "pm.collectionVariables.set('refreshToken', json.refreshToken);",
+                  "pm.collectionVariables.set('userId', json.userId);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/auth/refresh", "host": ["{{baseUrl}}"], "path": ["api", "auth", "refresh"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('accessToken', json.accessToken);",
+                  "  pm.collectionVariables.set('refreshToken', json.refreshToken);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/auth/logout", "host": ["{{baseUrl}}"], "path": ["api", "auth", "logout"] }
+          }
+        },
+        {
+          "name": "Logout All",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/auth/logout-all", "host": ["{{baseUrl}}"], "path": ["api", "auth", "logout-all"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Users",
+      "item": [
+        {
+          "name": "Get Current User (/me)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/users/me", "host": ["{{baseUrl}}"], "path": ["api", "users", "me"] }
+          }
+        },
+        {
+          "name": "Update Current User (/me)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Jane D. Updated\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/users/me", "host": ["{{baseUrl}}"], "path": ["api", "users", "me"] }
+          }
+        },
+        {
+          "name": "Get User By Id",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/users/{{userId}}", "host": ["{{baseUrl}}"], "path": ["api", "users", "{{userId}}"] }
+          }
+        },
+        {
+          "name": "Search User By Email (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/search?email={{userEmail}}",
+              "host": ["{{baseUrl}}"], "path": ["api", "users", "search"],
+              "query": [{ "key": "email", "value": "{{userEmail}}" }]
+            }
+          }
+        },
+        {
+          "name": "Get All Users (Admin, paginated)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/users?page=0&size=20&sort=createdAt,desc",
+              "host": ["{{baseUrl}}"], "path": ["api", "users"],
+              "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }, { "key": "sort", "value": "createdAt,desc" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - Resumes",
+      "item": [
+        {
+          "name": "Upload Resume (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "file", "type": "file", "src": "" },
+                { "key": "displayName", "value": "My Primary Resume", "type": "text" }
+              ]
+            },
+            "url": { "raw": "{{baseUrl}}/api/resumes", "host": ["{{baseUrl}}"], "path": ["api", "resumes"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('resumeId', json.resumeId);",
+                  "  pm.collectionVariables.set('resumeVersionId', json.latestVersionId);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get All Resumes (paginated)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/resumes?page=0&size=20&sort=createdAt,desc",
+              "host": ["{{baseUrl}}"], "path": ["api", "resumes"],
+              "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }, { "key": "sort", "value": "createdAt,desc" }]
+            }
+          }
+        },
+        {
+          "name": "Get Resume By Id",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/resumes/{{resumeId}}", "host": ["{{baseUrl}}"], "path": ["api", "resumes", "{{resumeId}}"] }
+          }
+        },
+        {
+          "name": "Update Resume Metadata",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"displayName\": \"My Updated Resume\",\n  \"notes\": \"Tweaked for backend roles\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/resumes/{{resumeId}}", "host": ["{{baseUrl}}"], "path": ["api", "resumes", "{{resumeId}}"] }
+          }
+        },
+        {
+          "name": "Add Resume Version (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "body": { "mode": "formdata", "formdata": [{ "key": "file", "type": "file", "src": "" }] },
+            "url": { "raw": "{{baseUrl}}/api/resumes/{{resumeId}}/versions", "host": ["{{baseUrl}}"], "path": ["api", "resumes", "{{resumeId}}", "versions"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.collectionVariables.set('resumeVersionId', pm.response.json().resumeVersionId);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Resume Versions",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/resumes/{{resumeId}}/versions", "host": ["{{baseUrl}}"], "path": ["api", "resumes", "{{resumeId}}", "versions"] }
+          }
+        },
+        {
+          "name": "Upload Job Description (text mode)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "text", "type": "text", "value": "We are hiring a backend engineer skilled in Java, Spring Boot, microservices, PostgreSQL, and Docker. Experience with DSA and system design is a plus." },
+                { "key": "company", "type": "text", "value": "Acme Corp" },
+                { "key": "jobTitle", "type": "text", "value": "Backend Engineer" }
+              ]
+            },
+            "url": { "raw": "{{baseUrl}}/api/resumes/job-descriptions", "host": ["{{baseUrl}}"], "path": ["api", "resumes", "job-descriptions"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.collectionVariables.set('jobDescriptionId', pm.response.json().jobDescriptionId);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get All Job Descriptions (paginated)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/resumes/job-descriptions?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "resumes", "job-descriptions"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] }
+          }
+        },
+        {
+          "name": "Get Job Description By Id",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/resumes/job-descriptions/{{jobDescriptionId}}", "host": ["{{baseUrl}}"], "path": ["api", "resumes", "job-descriptions", "{{jobDescriptionId}}"] }
+          }
+        },
+        {
+          "name": "Trigger Analysis",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resumeId\": {{resumeId}},\n  \"resumeVersionId\": {{resumeVersionId}},\n  \"jobDescriptionId\": {{jobDescriptionId}}\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/resumes/analyses", "host": ["{{baseUrl}}"], "path": ["api", "resumes", "analyses"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 202 || pm.response.code === 200 || pm.response.code === 201) {",
+                  "  pm.collectionVariables.set('analysisId', pm.response.json().analysisId);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Analyses (paginated, filtered)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/resumes/analyses?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "resumes", "analyses"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] }
+          }
+        },
+        {
+          "name": "Get Analysis By Id",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/resumes/analyses/{{analysisId}}", "host": ["{{baseUrl}}"], "path": ["api", "resumes", "analyses", "{{analysisId}}"] }
+          }
+        },
+        {
+          "name": "Generate Markdown Resume",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "******" }],
+            "url": { "raw": "{{baseUrl}}/api/resumes/analyses/{{analysisId}}/markdown?regenerate=false", "host": ["{{baseUrl}}"], "path": ["api", "resumes", "analyses", "{{analysisId}}", "markdown"], "query": [{ "key": "regenerate", "value": "false" }] }
+          }
+        },
+        {
+          "name": "Delete Job Description",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/resumes/job-descriptions/{{jobDescriptionId}}", "host": ["{{baseUrl}}"], "path": ["api", "resumes", "job-descriptions", "{{jobDescriptionId}}"] }
+          }
+        },
+        {
+          "name": "Delete Resume",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/resumes/{{resumeId}}", "host": ["{{baseUrl}}"], "path": ["api", "resumes", "{{resumeId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - Dashboard",
+      "item": [
+        {
+          "name": "Get Full Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/dashboard", "host": ["{{baseUrl}}"], "path": ["api", "dashboard"] }
+          }
+        },
+        {
+          "name": "Get Summary",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/dashboard/summary", "host": ["{{baseUrl}}"], "path": ["api", "dashboard", "summary"] }
+          }
+        },
+        {
+          "name": "Get Recent Activity",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/dashboard/recent-activity?limit=5", "host": ["{{baseUrl}}"], "path": ["api", "dashboard", "recent-activity"], "query": [{ "key": "limit", "value": "5" }] }
+          }
+        },
+        {
+          "name": "Get Charts",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/dashboard/charts?granularity=WEEK", "host": ["{{baseUrl}}"], "path": ["api", "dashboard", "charts"], "query": [{ "key": "granularity", "value": "WEEK" }] }
+          }
+        },
+        {
+          "name": "Get Insights",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/dashboard/insights?limit=10", "host": ["{{baseUrl}}"], "path": ["api", "dashboard", "insights"], "query": [{ "key": "limit", "value": "10" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 - History (Progress Tracking)",
+      "item": [
+        {
+          "name": "Get Full History (filtered, paginated)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/history?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "history"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] }
+          }
+        },
+        {
+          "name": "Get History By Resume",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/history/resumes/{{resumeId}}?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "history", "resumes", "{{resumeId}}"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] }
+          }
+        },
+        {
+          "name": "Get History By Resume Version",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/history/resume-versions/{{resumeVersionId}}?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "history", "resume-versions", "{{resumeVersionId}}"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] }
+          }
+        },
+        {
+          "name": "Get History By Job Description",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/history/job-descriptions/{{jobDescriptionId}}?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "history", "job-descriptions", "{{jobDescriptionId}}"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] }
+          }
+        },
+        {
+          "name": "Compare Two Analyses",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/history/compare?leftAnalysisId={{analysisId}}&rightAnalysisId={{analysisId}}", "host": ["{{baseUrl}}"], "path": ["api", "history", "compare"], "query": [{ "key": "leftAnalysisId", "value": "{{analysisId}}" }, { "key": "rightAnalysisId", "value": "{{analysisId}}" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 - Trends",
+      "item": [
+        {
+          "name": "Get Missing Skills (Top-N)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/trends/missing-skills?limit=10", "host": ["{{baseUrl}}"], "path": ["api", "trends", "missing-skills"], "query": [{ "key": "limit", "value": "10" }] }
+          }
+        },
+        {
+          "name": "Get Suggested Skills (Top-N)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/trends/suggested-skills?limit=10", "host": ["{{baseUrl}}"], "path": ["api", "trends", "suggested-skills"], "query": [{ "key": "limit", "value": "10" }] }
+          }
+        },
+        {
+          "name": "Get Technologies (Top-N)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/trends/technologies?limit=10", "host": ["{{baseUrl}}"], "path": ["api", "trends", "technologies"], "query": [{ "key": "limit", "value": "10" }] }
+          }
+        },
+        {
+          "name": "Get Companies (Top-N)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/trends/companies?limit=10", "host": ["{{baseUrl}}"], "path": ["api", "trends", "companies"], "query": [{ "key": "limit", "value": "10" }] }
+          }
+        },
+        {
+          "name": "Get Job Titles (Top-N)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/trends/job-titles?limit=10", "host": ["{{baseUrl}}"], "path": ["api", "trends", "job-titles"], "query": [{ "key": "limit", "value": "10" }] }
+          }
+        },
+        {
+          "name": "Get Upload Activity (Time-Series)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/trends/upload-activity?granularity=WEEK", "host": ["{{baseUrl}}"], "path": ["api", "trends", "upload-activity"], "query": [{ "key": "granularity", "value": "WEEK" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 - AI Service (direct, for debugging)",
+      "item": [
+        {
+          "name": "Analyze Resume (raw AI call)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"analysisId\": 1,\n  \"resumeText\": \"Experienced backend developer with Java, Spring Boot, REST APIs.\",\n  \"jobDescriptionText\": \"Looking for backend engineer skilled in Java, Spring Boot, PostgreSQL, DSA, Docker.\",\n  \"company\": \"Acme Corp\",\n  \"jobTitle\": \"Backend Engineer\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/ai/analyze", "host": ["{{baseUrl}}"], "path": ["api", "ai", "analyze"] },
+            "description": "Bypasses resume-service orchestration; use to isolate whether Ollama/ai-service itself is the failure point vs resume-service's call to it."
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 - Notifications (mostly service-to-service; exposed for testing)",
+      "item": [
+        {
+          "name": "Send Welcome Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"recipientEmail\": \"{{userEmail}}\",\n  \"userName\": \"Jane Doe\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/notifications/welcome", "host": ["{{baseUrl}}"], "path": ["api", "notifications", "welcome"] }
+          }
+        },
+        {
+          "name": "Send Analysis Completed Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recipientEmail\": \"{{userEmail}}\",\n  \"userName\": \"Jane Doe\",\n  \"resumeName\": \"My Primary Resume\",\n  \"jobDescriptionName\": \"Backend Engineer @ Acme Corp\",\n  \"atsScore\": 78,\n  \"analysisId\": {{analysisId}}\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/notifications/analysis-completed", "host": ["{{baseUrl}}"], "path": ["api", "notifications", "analysis-completed"] }
+          }
+        },
+        {
+          "name": "Send Weekly Trends Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recipientEmails\": [\"{{userEmail}}\"],\n  \"weekRangeLabel\": \"Aug 4 - Aug 10, 2026\",\n  \"trendingSkills\": [\"Java\", \"Docker\"],\n  \"mostAnalyzedJobRoles\": [\"Backend Engineer\"],\n  \"atsImprovements\": [\"Add DSA keywords\"],\n  \"weeklyInsights\": [\"Most users are missing Docker experience\"]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/notifications/weekly-trends", "host": ["{{baseUrl}}"], "path": ["api", "notifications", "weekly-trends"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 - Eureka (infra check)",
+      "item": [
+        {
+          "name": "List Registered Instances",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": { "raw": "http://localhost:8761/eureka/apps", "host": ["localhost"], "port": "8761", "path": ["eureka", "apps"] },
+            "description": "Bypasses gateway. Every service you expect to be running should appear here with status UP. If a service is missing, it isn't registered/running."
+          }
+        }
+      ]
+    }
+  ]
+}

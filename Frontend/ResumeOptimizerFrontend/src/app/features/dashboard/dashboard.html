@@ -1,0 +1,116 @@
+<div class="page-container">
+
+  <div class="page-header">
+    <div>
+      <h1>Welcome back{{ currentUser() ? ', ' + currentUser()!.name : '' }}</h1>
+      <p>Here's an overview of your resume optimization activity.</p>
+    </div>
+    <div class="page-actions">
+      <a routerLink="/resumes" class="btn-outline">Manage Resumes</a>
+      <a routerLink="/analysis" class="btn-primary" style="text-decoration:none;">Run Analysis</a>
+    </div>
+  </div>
+
+  <app-spinner *ngIf="loading()" label="Loading dashboard..."></app-spinner>
+
+  <div class="alert-banner alert-error" *ngIf="!loading() && error()">
+    {{ error() }}
+  </div>
+
+  <ng-container *ngIf="!loading() && !error() && data() as d">
+
+    <div class="stat-grid">
+      <div class="stat-card">
+        <span class="stat-label">Total Resumes</span>
+        <span class="stat-value">{{ d.summary.totalResumes }}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Job Descriptions</span>
+        <span class="stat-value">{{ d.summary.totalJobDescriptions }}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Total Analyses</span>
+        <span class="stat-value">{{ d.summary.totalAnalyses }}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Completed Analyses</span>
+        <span class="stat-value">{{ d.summary.completedAnalyses }}</span>
+      </div>
+      <div class="stat-card" *ngIf="d.summary.averageAtsScore != null">
+        <span class="stat-label">Avg. ATS Score</span>
+        <span class="stat-value">{{ d.summary.averageAtsScore | number:'1.0-0' }}</span>
+      </div>
+      <div class="stat-card" *ngIf="d.summary.averageMatchScore != null">
+        <span class="stat-label">Avg. Match Score</span>
+        <span class="stat-value">{{ d.summary.averageMatchScore | number:'1.0-0' }}</span>
+      </div>
+    </div>
+
+    <div class="card" *ngIf="d.degradedSources.length">
+      <div class="alert-banner alert-info">
+        Some data sources are temporarily unavailable: {{ d.degradedSources.join(', ') }}
+      </div>
+    </div>
+
+    <div class="card" *ngIf="!hasRecentActivity()">
+      <app-empty-state
+        title="No activity yet"
+        message="Upload a resume and run your first analysis to see your activity here."
+      >
+        <a routerLink="/resumes" class="btn-primary" style="text-decoration:none;">Upload Resume</a>
+      </app-empty-state>
+    </div>
+
+    <div class="dashboard-grid" *ngIf="hasRecentActivity()">
+
+      <div class="card" *ngIf="d.recentActivity.recentAnalyses.length">
+        <div class="section-title">Recent Analyses</div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Resume</th>
+                <th>Job Title</th>
+                <th>ATS</th>
+                <th>Match</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let a of d.recentActivity.recentAnalyses" [routerLink]="['/analysis', a.analysisId]" style="cursor:pointer;">
+                <td>{{ a.resumeDisplayName }}</td>
+                <td>{{ a.jobTitle || '—' }}</td>
+                <td><span class="badge" [ngClass]="scoreClass(a.atsScore)">{{ a.atsScore ?? '—' }}</span></td>
+                <td><span class="badge" [ngClass]="scoreClass(a.matchScore)">{{ a.matchScore ?? '—' }}</span></td>
+                <td>{{ a.status }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" *ngIf="d.recentActivity.recentResumes.length">
+        <div class="section-title">Recent Resumes</div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Uploaded</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let r of d.recentActivity.recentResumes" [routerLink]="['/resumes', r.resumeId]" style="cursor:pointer;">
+                <td>{{ r.displayName }}</td>
+                <td>{{ r.createdAt | date:'mediumDate' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+  </ng-container>
+
+</div>

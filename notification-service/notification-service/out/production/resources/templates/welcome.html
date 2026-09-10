@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Welcome to Resume Optimizer</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f4f5f7;font-family:Arial,Helvetica,sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f5f7;padding:32px 0;">
+    <tr>
+        <td align="center">
+            <table role="presentation" width="480" cellpadding="0" cellspacing="0"
+                   style="background-color:#ffffff;border-radius:8px;overflow:hidden;">
+                <tr>
+                    <td style="background-color:#4f46e5;padding:24px 32px;">
+                        <h1 style="color:#ffffff;margin:0;font-size:22px;">Resume Optimizer</h1>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:32px;">
+                        <h2 style="margin-top:0;color:#111827;">Welcome, <span th:text="${userName}">there</span>!</h2>
+                        <p style="color:#374151;font-size:15px;line-height:1.6;">
+                            Thanks for joining Resume Optimizer. We help you tailor your resume
+                            to any job description using AI-powered analysis, ATS scoring and
+                            actionable suggestions - so you can apply with confidence.
+                        </p>
+                        <p style="color:#374151;font-size:15px;line-height:1.6;">
+                            Upload your first resume and a job description to get your first
+                            ATS score in minutes.
+                        </p>
+                        <table role="presentation" cellpadding="0" cellspacing="0" style="margin:24px 0;">
+                            <tr>
+                                <td style="border-radius:6px;background-color:#4f46e5;">
+                                    <a th:href="${startOptimizingUrl}"
+                                       style="display:inline-block;padding:12px 24px;color:#ffffff;text-decoration:none;font-weight:bold;font-size:14px;">
+                                        Start Optimizing
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                        <p style="color:#9ca3af;font-size:12px;">
+                            If you did not create this account, you can safely ignore this email.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>
+

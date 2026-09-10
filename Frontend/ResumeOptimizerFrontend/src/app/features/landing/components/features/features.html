@@ -1,0 +1,48 @@
+<section class="features" id="features">
+
+  <div class="heading">
+
+    <span class="section-title">
+      Platform Features
+    </span>
+
+    <h2>
+      Everything You Need To Build A Better Resume
+    </h2>
+
+    <p>
+      ResumeOptimizer combines AI, ATS optimization,
+      analytics and resume management into one
+      enterprise platform.
+    </p>
+
+  </div>
+
+  <div class="feature-grid">
+
+    <div class="feature-card"
+         *ngFor="let feature of features">
+
+      <!--<div class="icon">
+
+        {{feature.icon}}
+
+      </div>-->
+
+      <h3>
+
+        {{feature.title}}
+
+      </h3>
+
+      <p>
+
+        {{feature.description}}
+
+      </p>
+
+    </div>
+
+  </div>
+
+</section>

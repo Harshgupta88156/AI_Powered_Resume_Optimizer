@@ -1,0 +1,27 @@
+.spinner-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px 20px;
+  color: var(--secondary);
+  font-size: 14px;
+}
+
+.spinner-circle {
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  animation: spin .7s linear infinite;
+}
+
+.size-sm .spinner-circle { width: 18px; height: 18px; border-width: 2px; }
+.size-lg .spinner-circle { width: 48px; height: 48px; border-width: 4px; }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+

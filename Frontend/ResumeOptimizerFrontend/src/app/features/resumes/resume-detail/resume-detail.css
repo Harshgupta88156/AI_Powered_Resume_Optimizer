@@ -1,0 +1,41 @@
+.back-link {
+  font-size: 14px;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+  width: fit-content;
+}
+
+.back-link:hover { text-decoration: underline; }
+
+.section-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.section-title-row .section-title { margin-bottom: 0; }
+
+.notes-view {
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.notes-empty {
+  font-size: 14px;
+  color: var(--secondary);
+  font-style: italic;
+}
+
+.version-upload {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.version-upload .form-input { max-width: 320px; }
+

@@ -1,0 +1,100 @@
+<div class="page-container">
+
+  <a routerLink="/job-descriptions" class="back-link">&larr; Back to job descriptions</a>
+
+  <app-spinner *ngIf="loading()" label="Loading job description..."></app-spinner>
+
+  <div class="alert-banner alert-error" *ngIf="!loading() && error()">
+    {{ error() }}
+  </div>
+
+  <ng-container *ngIf="!loading() && !error() && jd() as j">
+
+    <div class="page-header">
+      <div>
+        <h1>{{ title }}</h1>
+        <p>
+          <span *ngIf="j.company">{{ j.company }} &middot; </span>
+          Added {{ j.createdAt | date:'medium' }}
+        </p>
+      </div>
+
+      <div class="page-actions">
+        <button type="button" class="btn-primary btn-sm" (click)="analyzeAgainst()">
+          Analyze a resume against this
+        </button>
+        <button type="button" class="btn-ghost btn-sm" (click)="requestDelete()">
+          Delete
+        </button>
+      </div>
+    </div>
+
+    <div class="meta-grid">
+      <div class="meta-item">
+        <span class="meta-label">Company</span>
+        <span class="meta-value">{{ j.company || 'Not specified' }}</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Role</span>
+        <span class="meta-value">{{ j.jobTitle || 'Not specified' }}</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Source</span>
+        <span class="meta-value">
+          <span class="badge badge-neutral">{{ j.source === 'FILE' ? 'Uploaded file' : 'Pasted text' }}</span>
+        </span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Length</span>
+        <span class="meta-value">{{ (j.textLength || 0).toLocaleString() }} characters</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title-row">
+        <div class="section-title">Job description</div>
+
+        <div class="page-actions" *ngIf="hasText">
+          <button type="button" class="btn-ghost btn-sm" (click)="copyText()">Copy</button>
+          <button type="button" class="btn-outline btn-sm" (click)="downloadText()">Download .txt</button>
+          <a
+            *ngIf="j.cloudinaryUrl"
+            class="btn-ghost btn-sm"
+            [href]="j.cloudinaryUrl"
+            target="_blank"
+            rel="noopener noreferrer">
+            Open original file
+          </a>
+        </div>
+      </div>
+
+      <p class="form-hint" *ngIf="!hasText">
+        No text was extracted from this job description. If it came from a file,
+        the document may have been an image-only scan.
+      </p>
+
+      <ng-container *ngIf="hasText">
+        <pre class="jd-text" [class.clamped]="isLong && !expanded()">{{ text }}</pre>
+
+        <button
+          *ngIf="isLong"
+          type="button"
+          class="btn-ghost btn-sm expand-btn"
+          (click)="toggleExpanded()">
+          {{ expanded() ? 'Show less' : 'Show full description' }}
+        </button>
+      </ng-container>
+    </div>
+
+  </ng-container>
+
+</div>
+
+<app-confirm-dialog
+  [open]="showDeleteConfirm()"
+  title="Delete this job description?"
+  message="This cannot be undone. Job descriptions with existing analyses cannot be deleted."
+  confirmLabel="Delete"
+  (confirm)="confirmDelete()"
+  (cancel)="cancelDelete()">
+</app-confirm-dialog>

@@ -1,0 +1,275 @@
+<div class="page-container">
+
+  <div class="page-header">
+    <div>
+      <h1>Job Descriptions</h1>
+      <p>Add job descriptions to match against your resumes.</p>
+    </div>
+    <div class="page-actions">
+      <button type="button" class="btn-primary" (click)="toggleForm()">
+        {{ showForm() ? 'Cancel' : '+ Add Job Description' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="card form-card" *ngIf="showForm()">
+    <div class="section-title">New job description</div>
+
+    <div class="mode-toggle">
+      <button type="button" class="mode-btn" [class.active]="inputMode() === 'text'" (click)="setMode('text')">Paste Text</button>
+      <button type="button" class="mode-btn" [class.active]="inputMode() === 'file'" (click)="setMode('file')">Upload File</button>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Company</label>
+        <input type="text" class="form-input" [value]="company()" (input)="company.set($any($event.target).value)" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Job title</label>
+        <input type="text" class="form-input" [value]="jobTitle()" (input)="jobTitle.set($any($event.target).value)" />
+      </div>
+    </div>
+
+    <div class="form-group" *ngIf="inputMode() === 'text'">
+      <label class="form-label">Job description text</label>
+      <textarea
+        class="form-textarea"
+        rows="8"
+        placeholder="Paste the full job description here..."
+        [value]="textContent()"
+        (input)="textContent.set($any($event.target).value)"
+      ></textarea>
+    </div>
+
+    <div class="form-group" *ngIf="inputMode() === 'file'">
+      <label class="form-label">Job description file (PDF, DOC, DOCX)</label>
+      <input type="file" class="form-input" accept=".pdf,.doc,.docx" (change)="onFileSelected($event)" />
+      <span class="form-error" *ngIf="fileError()">{{ fileError() }}</span>
+    </div>
+
+    <div class="page-actions">
+      <button type="button" class="btn-primary" (click)="submit()" [disabled]="submitting()">
+        {{ submitting() ? 'Saving...' : 'Save Job Description' }}
+      </button>
+      <button type="button" class="btn-ghost" (click)="toggleForm()">Cancel</button>
+    </div>
+  </div>
+
+  <app-spinner *ngIf="loading()" label="Loading job descriptions..."></app-spinner>
+
+  <div class="alert-banner alert-error" *ngIf="!loading() && error()">
+    {{ error() }}
+  </div>
+
+  <div class="card" *ngIf="!loading() && !error() && jobDescriptions().length === 0">
+    <app-empty-state
+      title="No job descriptions yet"
+      message="Add a job description to run a resume match analysis against it."
+    >
+      <button type="button" class="btn-primary" (click)="toggleForm()">Add Job Description</button>
+    </app-empty-state>
+  </div>
+
+  <div class="jd-grid" *ngIf="!loading() && !error() && jobDescriptions().length > 0">
+    <div
+      class="card jd-card"
+      *ngFor="let jd of jobDescriptions()"
+      (click)="view(jd)"
+      (keydown.enter)="view(jd)"
+      tabindex="0"
+      role="button"
+      [attr.aria-label]="'View ' + (jd.jobTitle || 'job description')">
+
+      <div class="jd-card-header">
+        <span class="badge" [ngClass]="jd.source === 'FILE' ? 'badge-info' : 'badge-neutral'">{{ jd.source }}</span>
+        <button type="button" class="delete-btn" (click)="requestDelete(jd, $event)" title="Delete">&times;</button>
+      </div>
+
+      <div class="jd-title">{{ jd.jobTitle || 'Untitled Role' }}</div>
+      <div class="jd-company" *ngIf="jd.company">{{ jd.company }}</div>
+
+      <!-- The backend already sends this on every list row; it was simply
+           never rendered, so cards gave no clue what the JD contained. -->
+      <p class="jd-preview" *ngIf="jd.textPreview">{{ jd.textPreview }}</p>
+      <p class="jd-preview jd-preview-empty" *ngIf="!jd.textPreview">No text extracted from this job description.</p>
+
+      <div class="jd-meta" *ngIf="charCount(jd)">
+        {{ formatCount(charCount(jd)) }} characters
+      </div>
+
+      <div class="jd-footer">
+        <span class="jd-date">{{ jd.createdAt | date:'mediumDate' }}</span>
+        <span class="jd-actions">
+          <button type="button" class="btn-outline btn-sm" (click)="view(jd, $event)">View</button>
+          <a
+            [routerLink]="['/analysis']"
+            [queryParams]="{ jobDescriptionId: jd.jobDescriptionId }"
+            (click)="$event.stopPropagation()"
+            class="btn-ghost btn-sm jd-analyze">Analyze</a>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <app-pagination
+    [page]="page()"
+    [totalPages]="totalPages()"
+    [totalElements]="totalElements()"
+    [pageSize]="pageSize"
+    (pageChange)="goToPage($event)"></app-pagination>
+
+</div>
+
+
+<!-- Full job description reader -->
+<div class="jd-modal-backdrop" *ngIf="viewTarget() as jd" (click)="closeView()">
+
+  <div
+    class="jd-modal"
+    (click)="$event.stopPropagation()"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="jd-modal-title">
+
+    <div class="jd-modal-header">
+      <div>
+        <h2 id="jd-modal-title">{{ jd.jobTitle || 'Untitled Role' }}</h2>
+        <p class="jd-modal-sub">
+          <span *ngIf="jd.company">{{ jd.company }} &middot; </span>
+          Added {{ jd.createdAt | date:'mediumDate' }}
+        </p>
+      </div>
+
+      <button type="button" class="jd-modal-close" (click)="closeView()" aria-label="Close">&times;</button>
+    </div>
+
+    <!-- Text / original file tabs -->
+    <div class="jd-tabs" *ngIf="!editing() && jd.cloudinaryUrl">
+      <button type="button" [class.active]="viewTab() === 'text'" (click)="setViewTab('text')">Extracted text</button>
+      <button type="button" [class.active]="viewTab() === 'file'" (click)="setViewTab('file')">Original file</button>
+    </div>
+
+    <div class="jd-modal-body">
+
+      <app-spinner *ngIf="viewLoading()" label="Loading job description..."></app-spinner>
+
+      <div class="alert-banner alert-error" *ngIf="viewError()">{{ viewError() }}</div>
+
+      <!-- EDIT -->
+      <div class="jd-edit" *ngIf="editing()">
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="edit-title">Job title</label>
+            <input id="edit-title" type="text" class="form-input"
+                   [value]="editJobTitle()"
+                   (input)="editJobTitle.set($any($event.target).value)" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="edit-company">Company</label>
+            <input id="edit-company" type="text" class="form-input"
+                   [value]="editCompany()"
+                   (input)="editCompany.set($any($event.target).value)" />
+          </div>
+        </div>
+
+        <div class="form-group" *ngIf="canEditText()">
+          <label class="form-label" for="edit-text">Job description text</label>
+          <textarea id="edit-text" class="form-textarea" rows="14"
+                    [value]="editText()"
+                    (input)="editText.set($any($event.target).value)"></textarea>
+        </div>
+
+        <p class="form-hint" *ngIf="!canEditText()">
+          This job description came from an uploaded file, so its text is what was
+          parsed from the document and can't be edited here. Delete it and upload a
+          corrected file if the text is wrong.
+        </p>
+
+      </div>
+
+      <!-- READ: extracted text -->
+      <ng-container *ngIf="!editing() && !viewLoading() && !viewError()">
+
+        <pre class="jd-text"
+             *ngIf="viewTab() === 'text' && jd.extractedText">{{ jd.extractedText }}</pre>
+
+        <app-empty-state
+          *ngIf="viewTab() === 'text' && !jd.extractedText"
+          title="No text available"
+          message="Nothing could be extracted from this job description, so it cannot be analyzed.">
+        </app-empty-state>
+
+        <!-- READ: original document -->
+        <div class="jd-file-view" *ngIf="viewTab() === 'file'">
+
+          <iframe
+            *ngIf="canEmbedFile() && safeFileUrl() as src"
+            [src]="src"
+            title="Job description document"
+            class="jd-file-frame"></iframe>
+
+          <app-empty-state
+            *ngIf="!canEmbedFile()"
+            title="Preview not available"
+            message="Only PDFs can be previewed in the browser. Use the button below to open the original document.">
+          </app-empty-state>
+
+        </div>
+
+      </ng-container>
+
+    </div>
+
+    <div class="jd-modal-footer">
+      <span class="jd-modal-count" *ngIf="charCount(jd)">{{ formatCount(charCount(jd)) }} characters</span>
+
+      <span class="jd-modal-actions">
+        <ng-container *ngIf="editing()">
+          <button type="button" class="btn-ghost btn-sm" (click)="cancelEdit()">Cancel</button>
+          <button type="button" class="btn-primary btn-sm" (click)="saveEdit()" [disabled]="savingEdit()">
+            {{ savingEdit() ? 'Saving...' : 'Save changes' }}
+          </button>
+        </ng-container>
+
+        <button
+          *ngIf="!editing()"
+          type="button"
+          class="btn-outline btn-sm"
+          (click)="startEdit()">Edit / Rename</button>
+
+        <a
+          *ngIf="!editing() && jd.cloudinaryUrl"
+          [href]="jd.cloudinaryUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn-ghost btn-sm jd-analyze">Open original file</a>
+
+        <button
+          type="button"
+          class="btn-ghost btn-sm"
+          (click)="copyText()"
+          *ngIf="!editing() && jd.extractedText">Copy text</button>
+
+        <a
+          *ngIf="!editing()"
+          [routerLink]="['/analysis']"
+          [queryParams]="{ jobDescriptionId: jd.jobDescriptionId }"
+          class="btn-primary btn-sm jd-analyze">Analyze against a resume</a>
+      </span>
+    </div>
+
+  </div>
+</div>
+
+<app-confirm-dialog
+  [open]="!!deleteTarget()"
+  title="Delete this job description?"
+  message="This action cannot be undone."
+  confirmLabel="Delete"
+  (confirm)="confirmDelete()"
+  (cancel)="cancelDelete()"
+></app-confirm-dialog>
+

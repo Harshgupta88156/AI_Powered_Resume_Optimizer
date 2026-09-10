@@ -1,0 +1,22 @@
+<div class="layout">
+
+  <app-header (menuToggle)="toggleSidebar()"></app-header>
+
+  <div class="body">
+
+    <app-sidebar [open]="sidebarOpen()" (navigate)="closeSidebar()"></app-sidebar>
+
+    <!-- Tap-anywhere-to-dismiss backdrop for the mobile drawer. -->
+    <div
+      class="sidebar-backdrop"
+      *ngIf="sidebarOpen()"
+      (click)="closeSidebar()"
+      aria-hidden="true"></div>
+
+    <main class="content">
+      <router-outlet></router-outlet>
+    </main>
+
+  </div>
+
+</div>

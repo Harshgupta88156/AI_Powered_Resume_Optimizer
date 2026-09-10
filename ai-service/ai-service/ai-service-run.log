@@ -1,0 +1,88 @@
+> Task :compileJava UP-TO-DATE
+> Task :processResources UP-TO-DATE
+> Task :classes UP-TO-DATE
+> Task :resolveMainClassName
+
+> Task :bootRun
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.0)
+
+2026-08-10T15:21:23.417+05:30  INFO 26684 --- [ai-service] [  restartedMain] c.a.ai_service.AiServiceApplication      : Starting AiServiceApplication using Java 25.0.3 with PID 26684 (C:\Users\tdhakate\Downloads\Resume_optimizer\ai-service\ai-service\build\classes\java\main started by tdhakate in C:\Users\tdhakate\Downloads\Resume_optimizer\ai-service\ai-service)
+2026-08-10T15:21:23.424+05:30  INFO 26684 --- [ai-service] [  restartedMain] c.a.ai_service.AiServiceApplication      : No active profile set, falling back to 1 default profile: "default"
+2026-08-10T15:21:23.522+05:30  INFO 26684 --- [ai-service] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-08-10T15:21:23.522+05:30  INFO 26684 --- [ai-service] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-08-10T15:21:25.562+05:30  INFO 26684 --- [ai-service] [  restartedMain] o.s.cloud.context.scope.GenericScope     : BeanFactory id=b456d36b-059e-3991-b48e-ffd0888d1a1b
+2026-08-10T15:21:26.123+05:30  INFO 26684 --- [ai-service] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8084 (http)
+2026-08-10T15:21:26.142+05:30  INFO 26684 --- [ai-service] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-08-10T15:21:26.143+05:30  INFO 26684 --- [ai-service] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.22]
+2026-08-10T15:21:26.219+05:30  INFO 26684 --- [ai-service] [  restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 2695 ms
+2026-08-10T15:21:27.228+05:30  INFO 26684 --- [ai-service] [  restartedMain] DiscoveryClientOptionalArgsConfiguration : Eureka HTTP Client uses RestClient.
+2026-08-10T15:21:27.266+05:30  WARN 26684 --- [ai-service] [  restartedMain] iguration$LoadBalancerCaffeineWarnLogger : Spring Cloud LoadBalancer is currently working with the default cache. While this cache implementation is useful for development and tests, it's recommended to use Caffeine cache in production.You can switch to using Caffeine cache, by adding it and org.springframework.cache.caffeine.CaffeineCacheManager to the classpath.
+2026-08-10T15:21:27.291+05:30  INFO 26684 --- [ai-service] [  restartedMain] o.s.c.n.eureka.InstanceInfoFactory       : Setting initial instance status as: STARTING
+2026-08-10T15:21:27.319+05:30  INFO 26684 --- [ai-service] [  restartedMain] com.netflix.discovery.DiscoveryClient    : Initializing Eureka in region us-east-1
+2026-08-10T15:21:27.322+05:30  INFO 26684 --- [ai-service] [  restartedMain] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-08-10T15:21:27.332+05:30  INFO 26684 --- [ai-service] [  restartedMain] com.netflix.discovery.DiscoveryClient    : Disable delta property : false
+2026-08-10T15:21:27.332+05:30  INFO 26684 --- [ai-service] [  restartedMain] com.netflix.discovery.DiscoveryClient    : Single vip registry refresh property : null
+2026-08-10T15:21:27.332+05:30  INFO 26684 --- [ai-service] [  restartedMain] com.netflix.discovery.DiscoveryClient    : Force full registry fetch : false
+2026-08-10T15:21:27.332+05:30  INFO 26684 --- [ai-service] [  restartedMain] com.netflix.discovery.DiscoveryClient    : Application is null : false
+2026-08-10T15:21:27.332+05:30  INFO 26684 --- [ai-service] [  restartedMain] com.netflix.discovery.DiscoveryClient    : Registered Applications size is zero : true
+2026-08-10T15:21:27.332+05:30  INFO 26684 --- [ai-service] [  restartedMain] com.netflix.discovery.DiscoveryClient    : Application version is -1: true
+2026-08-10T15:21:27.333+05:30  INFO 26684 --- [ai-service] [  restartedMain] com.netflix.discovery.DiscoveryClient    : Getting all instance registry info from the eureka server
+2026-08-10T15:21:27.620+05:30  INFO 26684 --- [ai-service] [  restartedMain] com.netflix.discovery.DiscoveryClient    : The response status is 200
+2026-08-10T15:21:27.623+05:30  INFO 26684 --- [ai-service] [  restartedMain] com.netflix.discovery.DiscoveryClient    : Starting heartbeat executor: renew interval is: 30
+2026-08-10T15:21:27.625+05:30  INFO 26684 --- [ai-service] [  restartedMain] c.n.discovery.InstanceInfoReplicator     : InstanceInfoReplicator onDemand update allowed rate per min is 4
+2026-08-10T15:21:27.627+05:30  INFO 26684 --- [ai-service] [  restartedMain] com.netflix.discovery.DiscoveryClient    : Discovery Client initialized at timestamp 1786355487626 with initial instances count: 7
+2026-08-10T15:21:27.630+05:30  INFO 26684 --- [ai-service] [  restartedMain] o.s.c.n.e.s.EurekaServiceRegistry        : Registering application AI-SERVICE with eureka with status UP
+2026-08-10T15:21:27.631+05:30  INFO 26684 --- [ai-service] [  restartedMain] com.netflix.discovery.DiscoveryClient    : Saw local status change event StatusChangeEvent [timestamp=1786355487631, current=UP, previous=STARTING]
+2026-08-10T15:21:27.633+05:30  INFO 26684 --- [ai-service] [foReplicator-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_AI-SERVICE/10.70.242.57:ai-service:8084: registering service...
+2026-08-10T15:21:27.666+05:30  INFO 26684 --- [ai-service] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8084 (http) with context path '/'
+2026-08-10T15:21:27.667+05:30  INFO 26684 --- [ai-service] [  restartedMain] .s.c.n.e.s.EurekaAutoServiceRegistration : Updating port to 8084
+2026-08-10T15:21:27.675+05:30  INFO 26684 --- [ai-service] [foReplicator-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_AI-SERVICE/10.70.242.57:ai-service:8084 - registration status: 204
+2026-08-10T15:21:27.681+05:30  INFO 26684 --- [ai-service] [  restartedMain] c.a.ai_service.AiServiceApplication      : Started AiServiceApplication in 4.959 seconds (process running for 6.039)
+2026-08-10T15:22:57.756+05:30  INFO 26684 --- [ai-service] [beatExecutor-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_AI-SERVICE/10.70.242.57:ai-service:8084 - Re-registering apps/AI-SERVICE
+2026-08-10T15:22:57.756+05:30  INFO 26684 --- [ai-service] [beatExecutor-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_AI-SERVICE/10.70.242.57:ai-service:8084: registering service...
+2026-08-10T15:22:57.761+05:30  INFO 26684 --- [ai-service] [beatExecutor-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_AI-SERVICE/10.70.242.57:ai-service:8084 - registration status: 204
+2026-08-10T15:23:27.763+05:30  INFO 26684 --- [ai-service] [beatExecutor-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_AI-SERVICE/10.70.242.57:ai-service:8084 - Re-registering apps/AI-SERVICE
+2026-08-10T15:23:27.764+05:30  INFO 26684 --- [ai-service] [beatExecutor-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_AI-SERVICE/10.70.242.57:ai-service:8084: registering service...
+2026-08-10T15:23:27.767+05:30  INFO 26684 --- [ai-service] [beatExecutor-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_AI-SERVICE/10.70.242.57:ai-service:8084 - registration status: 204
+2026-08-10T15:25:27.778+05:30  INFO 26684 --- [ai-service] [beatExecutor-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_AI-SERVICE/10.70.242.57:ai-service:8084 - Re-registering apps/AI-SERVICE
+2026-08-10T15:25:27.778+05:30  INFO 26684 --- [ai-service] [beatExecutor-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_AI-SERVICE/10.70.242.57:ai-service:8084: registering service...
+2026-08-10T15:25:27.784+05:30  INFO 26684 --- [ai-service] [beatExecutor-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_AI-SERVICE/10.70.242.57:ai-service:8084 - registration status: 204
+2026-08-10T15:26:10.107+05:30  INFO 26684 --- [ai-service] [nio-8084-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-08-10T15:26:10.108+05:30  INFO 26684 --- [ai-service] [nio-8084-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-08-10T15:26:10.110+05:30  INFO 26684 --- [ai-service] [nio-8084-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-08-10T15:26:27.284+05:30  INFO 26684 --- [ai-service] [rap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-08-10T15:27:28.029+05:30  INFO 26684 --- [ai-service] [beatExecutor-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_AI-SERVICE/10.70.242.57:ai-service:8084 - Re-registering apps/AI-SERVICE
+2026-08-10T15:27:28.030+05:30  INFO 26684 --- [ai-service] [beatExecutor-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_AI-SERVICE/10.70.242.57:ai-service:8084: registering service...
+2026-08-10T15:27:28.050+05:30  INFO 26684 --- [ai-service] [beatExecutor-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_AI-SERVICE/10.70.242.57:ai-service:8084 - registration status: 204
+2026-08-10T15:30:28.224+05:30  INFO 26684 --- [ai-service] [beatExecutor-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_AI-SERVICE/10.70.242.57:ai-service:8084 - Re-registering apps/AI-SERVICE
+2026-08-10T15:30:28.224+05:30  INFO 26684 --- [ai-service] [beatExecutor-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_AI-SERVICE/10.70.242.57:ai-service:8084: registering service...
+2026-08-10T15:30:28.231+05:30  INFO 26684 --- [ai-service] [beatExecutor-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_AI-SERVICE/10.70.242.57:ai-service:8084 - registration status: 204
+2026-08-10T15:31:27.244+05:30  INFO 26684 --- [ai-service] [rap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-08-10T15:32:28.269+05:30  INFO 26684 --- [ai-service] [beatExecutor-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_AI-SERVICE/10.70.242.57:ai-service:8084 - Re-registering apps/AI-SERVICE
+2026-08-10T15:32:28.270+05:30  INFO 26684 --- [ai-service] [beatExecutor-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_AI-SERVICE/10.70.242.57:ai-service:8084: registering service...
+2026-08-10T15:32:28.294+05:30  INFO 26684 --- [ai-service] [beatExecutor-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_AI-SERVICE/10.70.242.57:ai-service:8084 - registration status: 204
+
+> Task :bootRun FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':bootRun' (registered by plugin 'org.springframework.boot').
+> Process 'command 'C:\Program Files\Java\jdk-25.0.3\bin\java.exe'' finished with non-zero exit value 1
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 13m 46s
+4 actionable tasks: 2 executed, 2 up-to-date

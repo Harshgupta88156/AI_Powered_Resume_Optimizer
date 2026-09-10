@@ -1,0 +1,34 @@
+<header class="navbar">
+
+  <a routerLink="/" class="logo">
+    Resume<span>Optimizer</span>
+  </a>
+
+  <nav>
+
+    <a routerLink="/" fragment="hero">Home</a>
+
+    <a routerLink="/" fragment="features">Features</a>
+
+    <app-theme-toggle></app-theme-toggle>
+
+    <!-- Signed out -->
+    <ng-container *ngIf="!currentUser()">
+      <a routerLink="/login">Login</a>
+      <button type="button" routerLink="/register">Get Started</button>
+    </ng-container>
+
+    <!-- Signed in: the landing page is public, so a logged-in visitor should
+         see their account and a way back into the app rather than being
+         invited to log in again. -->
+    <ng-container *ngIf="currentUser() as user">
+      <a routerLink="/profile" class="nav-user" title="View profile">
+        <span class="nav-avatar">{{ initials }}</span>
+        <span class="nav-username">{{ user.name }}</span>
+      </a>
+      <button type="button" routerLink="/dashboard">Go to Dashboard</button>
+    </ng-container>
+
+  </nav>
+
+</header>

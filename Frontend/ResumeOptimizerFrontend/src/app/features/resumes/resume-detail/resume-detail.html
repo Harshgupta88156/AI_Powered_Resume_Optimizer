@@ -1,0 +1,105 @@
+<div class="page-container">
+
+  <a routerLink="/resumes" class="back-link">&larr; Back to resumes</a>
+
+  <app-spinner *ngIf="loading()" label="Loading resume..."></app-spinner>
+
+  <div class="alert-banner alert-error" *ngIf="!loading() && error()">
+    {{ error() }}
+  </div>
+
+  <ng-container *ngIf="!loading() && !error() && resume() as r">
+
+    <div class="page-header">
+      <div>
+        <h1>{{ r.displayName }}</h1>
+        <p>{{ r.fileName }} &middot; {{ r.totalVersions }} version(s) &middot; last updated {{ r.updatedAt | date:'medium' }}</p>
+      </div>
+      <div class="page-actions">
+        <a [href]="r.cloudinaryUrl" target="_blank" class="btn-outline" style="text-decoration:none;">View File</a>
+        <a [routerLink]="['/analysis']" [queryParams]="{ resumeId: r.resumeId }" class="btn-primary" style="text-decoration:none;">Analyze</a>
+        <button type="button" class="btn-ghost" (click)="requestDelete()">Delete</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title-row">
+        <div class="section-title">Details</div>
+        <button type="button" class="btn-ghost btn-sm" (click)="toggleEdit()">
+          {{ editMode() ? 'Cancel' : 'Edit' }}
+        </button>
+      </div>
+
+      <ng-container *ngIf="!editMode()">
+        <p class="notes-view" *ngIf="r.notes">{{ r.notes }}</p>
+        <p class="notes-empty" *ngIf="!r.notes">No notes added.</p>
+      </ng-container>
+
+      <ng-container *ngIf="editMode()">
+        <div class="form-group">
+          <label class="form-label">Display name</label>
+          <input type="text" class="form-input" [value]="editDisplayName()" (input)="editDisplayName.set($any($event.target).value)" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes</label>
+          <textarea class="form-textarea" [value]="editNotes()" (input)="editNotes.set($any($event.target).value)"></textarea>
+        </div>
+        <div class="page-actions">
+          <button type="button" class="btn-primary" (click)="saveEdit()" [disabled]="saving()">
+            {{ saving() ? 'Saving...' : 'Save Changes' }}
+          </button>
+        </div>
+      </ng-container>
+    </div>
+
+    <div class="card">
+      <div class="section-title-row">
+        <div class="section-title">Versions</div>
+        <button type="button" class="btn-outline btn-sm" (click)="toggleAddVersion()">
+          {{ addingVersion() ? 'Cancel' : '+ Add Version' }}
+        </button>
+      </div>
+
+      <div class="version-upload" *ngIf="addingVersion()">
+        <input type="file" class="form-input" accept=".pdf,.doc,.docx" (change)="onVersionFileSelected($event)" />
+        <span class="form-error" *ngIf="versionFileError()">{{ versionFileError() }}</span>
+        <button type="button" class="btn-primary btn-sm" (click)="uploadVersion()" [disabled]="saving()">
+          {{ saving() ? 'Uploading...' : 'Upload' }}
+        </button>
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Version</th>
+            <th>File</th>
+            <th>Size</th>
+            <th>Uploaded</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let v of versions()">
+            <td><span class="badge badge-info">v{{ v.versionNumber }}</span></td>
+            <td>{{ v.fileName }}</td>
+            <td>{{ (v.fileSizeBytes / 1024) | number:'1.0-0' }} KB</td>
+            <td>{{ v.createdAt | date:'mediumDate' }}</td>
+            <td><a [href]="v.cloudinaryUrl" target="_blank" class="btn-ghost btn-sm" style="text-decoration:none;">View</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </ng-container>
+
+</div>
+
+<app-confirm-dialog
+  [open]="showDeleteConfirm()"
+  title="Delete this resume?"
+  message="This will permanently delete this resume and all its versions. This cannot be undone."
+  confirmLabel="Delete"
+  (confirm)="confirmDelete()"
+  (cancel)="cancelDelete()"
+></app-confirm-dialog>
+

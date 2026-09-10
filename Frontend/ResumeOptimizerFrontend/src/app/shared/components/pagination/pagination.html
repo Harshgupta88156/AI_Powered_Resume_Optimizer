@@ -1,0 +1,46 @@
+<nav class="pager" *ngIf="visible()" aria-label="Pagination">
+
+  <p class="pager-range" *ngIf="range() as r">
+    Showing {{ r.from }}–{{ r.to }} of {{ r.total }}
+  </p>
+
+  <div class="pager-controls">
+
+    <button
+      type="button"
+      class="pager-btn"
+      (click)="go(currentPage() - 1)"
+      [disabled]="currentPage() === 0"
+      aria-label="Previous page">
+      ‹
+    </button>
+
+    <ng-container *ngFor="let p of pages()">
+
+      <span class="pager-gap" *ngIf="p === gap" aria-hidden="true">…</span>
+
+      <button
+        *ngIf="p !== gap"
+        type="button"
+        class="pager-btn"
+        [class.active]="p === currentPage()"
+        [attr.aria-current]="p === currentPage() ? 'page' : null"
+        [attr.aria-label]="'Page ' + (p + 1)"
+        (click)="go(p)">
+        {{ p + 1 }}
+      </button>
+
+    </ng-container>
+
+    <button
+      type="button"
+      class="pager-btn"
+      (click)="go(currentPage() + 1)"
+      [disabled]="currentPage() + 1 >= totalPageCount()"
+      aria-label="Next page">
+      ›
+    </button>
+
+  </div>
+
+</nav>

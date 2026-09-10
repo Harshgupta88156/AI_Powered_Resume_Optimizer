@@ -1,0 +1,95 @@
+.navbar {
+  height: 80px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 40px;
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 15px rgba(0,0,0,.05);
+}
+
+.logo {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+  .logo span {
+    color: var(--primary);
+  }
+
+nav {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+  nav a {
+    text-decoration: none;
+    color: var(--secondary);
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  background: var(--primary);
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* ===========================
+   SIGNED-IN ACCOUNT
+=========================== */
+
+.navbar .logo {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.nav-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  padding: 4px 10px 4px 4px;
+  border-radius: 999px;
+  transition: background-color .2s ease;
+}
+
+.nav-user:hover {
+  background: var(--surface-alt);
+}
+
+.nav-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--on-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.nav-username {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .nav-username { display: none; }
+}

@@ -1,0 +1,318 @@
+<div class="register-page">
+
+  <div class="theme-slot">
+    <app-theme-toggle></app-theme-toggle>
+  </div>
+
+
+  <div class="left-panel">
+
+    <div class="brand">
+
+      <h1>ResumeOptimizer</h1>
+
+      <p>
+        Create your account and start optimizing your resume using AI.
+        Improve ATS compatibility, discover missing skills, and track
+        your resume performance through a professional dashboard.
+      </p>
+
+    </div>
+
+    <div class="feature-list">
+
+      <div class="feature">
+
+        <div class="icon">✓</div>
+
+        <div>
+
+          <h4>AI Resume Analysis</h4>
+
+          <p>
+            Receive intelligent suggestions for every uploaded
+            resume.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="feature">
+
+        <div class="icon">✓</div>
+
+        <div>
+
+          <h4>ATS Optimization</h4>
+
+          <p>
+            Match resumes with job descriptions and improve your
+            ATS score.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="feature">
+
+        <div class="icon">✓</div>
+
+        <div>
+
+          <h4>Resume History</h4>
+
+          <p>
+            Keep every resume and analysis securely stored for
+            future reference.
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="right-panel">
+
+    <div class="register-card">
+
+      <div class="card-header">
+
+        <h2>Create Account</h2>
+
+        <p>
+          Register to access ResumeOptimizer
+        </p>
+
+      </div>
+
+      <form [formGroup]="registerForm"
+            (ngSubmit)="register()">
+
+        <!-- Name -->
+
+        <div class="form-group">
+
+          <label>Full Name</label>
+
+          <input type="text"
+                 placeholder="Enter your full name"
+                 formControlName="name">
+
+          <small class="error"
+                 *ngIf="name.touched && name.errors?.['required']">
+
+            Name is required.
+
+          </small>
+
+          <small class="error"
+                 *ngIf="name.touched && name.errors?.['minlength']">
+
+            Name should contain at least 3 characters.
+
+          </small>
+
+        </div>
+
+        <!-- Email -->
+
+        <div class="form-group">
+
+          <label>Email</label>
+
+          <input type="email"
+                 placeholder="Enter your email"
+                 formControlName="email">
+
+          <small class="error"
+                 *ngIf="email.touched && email.errors?.['required']">
+
+            Email is required.
+
+          </small>
+
+          <small class="error"
+                 *ngIf="email.touched && email.errors?.['email']">
+
+            Please enter a valid email.
+
+          </small>
+
+        </div>
+
+        <!-- Password -->
+
+        <div class="form-group">
+
+          <label>Password</label>
+
+          <div class="password-wrapper">
+
+            <input [type]="hidePassword() ? 'password' : 'text'"
+                   formControlName="password"
+                   placeholder="Create password">
+
+            <button type="button"
+                    class="eye-btn"
+                    (click)="togglePassword()">
+
+              {{ hidePassword() ? 'Show' : 'Hide' }}
+
+            </button>
+
+          </div>
+
+          <small class="error"
+                 *ngIf="password.touched && password.errors?.['required']">
+
+            Password is required.
+
+          </small>
+
+          <small class="error"
+                 *ngIf="password.touched && password.errors?.['minlength']">
+
+            Minimum 8 characters.
+
+          </small>
+
+          <small class="error"
+                 *ngIf="password.touched && password.errors?.['pattern']">
+
+            Password must contain uppercase, lowercase and a number.
+
+          </small>
+
+<!--          <div class="password-strength">-->
+
+<!--            <span>Password Strength</span>-->
+
+<!--            <strong [class.weak]="getPasswordStrength() === 'Weak'"-->
+<!--                    [class.medium]="getPasswordStrength() === 'Medium'"-->
+<!--                    [class.strong]="getPasswordStrength() === 'Strong'">-->
+
+<!--              {{ getPasswordStrength() }}-->
+
+<!--            </strong>-->
+
+<!--          </div>-->
+
+        </div>
+
+        <!-- Confirm Password -->
+
+        <div class="form-group">
+
+          <label>Confirm Password</label>
+
+          <div class="password-wrapper">
+
+            <input [type]="hideConfirmPassword() ? 'password' : 'text'"
+                   formControlName="confirmPassword"
+                   placeholder="Confirm password">
+
+            <button type="button"
+                    class="eye-btn"
+                    (click)="toggleConfirmPassword()">
+
+              {{ hideConfirmPassword() ? 'Show' : 'Hide' }}
+
+            </button>
+
+          </div>
+
+          <small class="error"
+                 *ngIf="confirmPassword.touched && confirmPassword.errors?.['required']">
+
+            Please confirm your password.
+
+          </small>
+
+          <small class="error"
+                 *ngIf="registerForm.errors?.['passwordMismatch'] && confirmPassword.touched">
+
+            Passwords do not match.
+
+          </small>
+
+        </div>
+
+        <!-- Terms -->
+
+<!--        <div class="terms">-->
+
+<!--          <label>-->
+
+<!--            <input type="checkbox"-->
+
+
+<!--          </label>-->
+
+<!--        </div>-->
+
+<!--        <small class="error"-->
+
+
+<!--        </small>-->
+
+        <div class="server-error"
+             *ngIf="errorMessage()">
+
+          {{ errorMessage() }}
+
+        </div>
+
+        <button class="register-btn"
+                type="submit"
+                [disabled]="loading()">
+
+          {{ loading() ? 'Creating Account...' : 'Create Account' }}
+
+        </button>
+
+      </form>
+
+      <div class="divider">
+
+        <span>OR</span>
+
+      </div>
+
+      <button class="github-btn"
+              (click)="registerWithGithub()">
+
+        <svg width="20"
+             height="20"
+             viewBox="0 0 16 16"
+             fill="currentColor">
+
+          <path d="M8 0C3.58 0 0 3.58 0 8a8.013 8.013 0 005.47 7.59c.4.07.55-.17.55-.38v-1.49c-2.22.49-2.69-.94-2.69-.94-.37-.92-.9-1.16-.9-1.16-.73-.5.06-.49.06-.49.81.06 1.24.83 1.24.83.72 1.23 1.88.87 2.34.67.07-.52.28-.87.5-1.07-1.77-.2-3.64-.88-3.64-3.95 0-.87.31-1.58.82-2.13-.08-.2-.36-1.01.08-2.1 0 0 .67-.22 2.2.82a7.55 7.55 0 014 0c1.53-1.04 2.2-.82 2.2-.82.44 1.09.16 1.9.08 2.1.51.55.82 1.26.82 2.13 0 3.08-1.87 3.74-3.66 3.94.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8.014 8.014 0 0016 8c0-4.42-3.58-8-8-8z" />
+
+        </svg>
+
+        Continue with GitHub
+
+      </button>
+
+      <div class="login-link">
+
+        Already have an account?
+
+        <a routerLink="/login">
+
+          Sign In
+
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

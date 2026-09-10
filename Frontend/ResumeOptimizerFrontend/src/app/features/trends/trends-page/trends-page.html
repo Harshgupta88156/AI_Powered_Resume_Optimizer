@@ -1,0 +1,332 @@
+
+<div class="trends-page">
+
+  <div class="page-header">
+    <div>
+      <h1>Global Trends</h1>
+      <p>Overview of skills, technologies, roles and employers across analyzed job data.</p>
+    </div>
+  </div>
+
+
+  <app-spinner
+    *ngIf="loading()"
+    label="Loading trends...">
+  </app-spinner>
+
+
+  <div
+    class="alert-banner alert-error"
+    *ngIf="!loading() && error()">
+
+    {{ error() }}
+
+    <button
+      type="button"
+      class="btn-outline btn-sm"
+      (click)="load()">
+      Retry
+    </button>
+
+  </div>
+
+
+  <app-empty-state
+    *ngIf="!loading() && !error() && !hasAnyData()"
+    title="No trend data available"
+    message="Trend information will appear here once data is available.">
+  </app-empty-state>
+
+
+  <ng-container *ngIf="!loading() && !error() && hasAnyData()">
+
+    <!-- MARKET SNAPSHOT -->
+
+    <section class="snapshot">
+
+      <div class="snapshot-item">
+        <span class="snapshot-label">Top Technology</span>
+        <strong>
+          {{ leadingTechnology?.label || '—' }}
+        </strong>
+        <small *ngIf="leadingTechnology">
+          {{ formatCount(leadingTechnology.count) }} mentions
+        </small>
+      </div>
+
+      <div class="snapshot-item">
+        <span class="snapshot-label">Top Skill</span>
+        <strong>
+          {{ leadingSkill?.label || '—' }}
+        </strong>
+        <small *ngIf="leadingSkill">
+          {{ formatCount(leadingSkill.count) }} mentions
+        </small>
+      </div>
+
+      <div class="snapshot-item">
+        <span class="snapshot-label">Top Role</span>
+        <strong>
+          {{ leadingJobTitle?.label || '—' }}
+        </strong>
+        <small *ngIf="leadingJobTitle">
+          {{ formatCount(leadingJobTitle.count) }} occurrences
+        </small>
+      </div>
+
+      <div class="snapshot-item">
+        <span class="snapshot-label">Top Employer</span>
+        <strong>
+          {{ leadingCompany?.label || '—' }}
+        </strong>
+        <small *ngIf="leadingCompany">
+          {{ formatCount(leadingCompany.count) }} occurrences
+        </small>
+      </div>
+
+    </section>
+
+
+    <!-- ACTIVITY OVER TIME -->
+
+    <section class="trend-section" *ngIf="activitySeries.length">
+
+      <div class="section-header">
+        <div>
+          <h2>Analysis Activity</h2>
+          <p>Resumes analyzed over time.</p>
+        </div>
+      </div>
+
+      <div class="card chart-card">
+        <app-line-chart [points]="activitySeries"></app-line-chart>
+      </div>
+
+    </section>
+
+
+    <!-- SKILLS + TECHNOLOGIES -->
+
+    <section class="trend-section">
+
+      <div class="section-header">
+        <div>
+          <h2>Skills & Technologies</h2>
+          <p>Most frequently identified across job descriptions.</p>
+        </div>
+      </div>
+
+
+      <div class="chart-grid">
+
+        <div class="card chart-card">
+          <div class="section-title">Top skills by demand</div>
+          <app-bar-chart [items]="topSkills"></app-bar-chart>
+        </div>
+
+        <div class="card chart-card">
+          <div class="section-title">Technology share</div>
+          <app-donut-chart [items]="topTechnologies"></app-donut-chart>
+        </div>
+
+      </div>
+
+      <div class="trend-card">
+
+        <div class="trend-column">
+
+          <div class="column-title">
+            Skills
+          </div>
+
+          <div class="rank-list">
+
+            <div
+              class="rank-row"
+              *ngFor="let item of topSkills; let i = index">
+
+              <span class="rank-number">
+                {{ i + 1 }}
+              </span>
+
+              <span class="rank-name">
+                {{ item.label }}
+              </span>
+
+              <span class="rank-count">
+                {{ formatCount(item.count) }}
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="trend-divider"></div>
+
+
+        <div class="trend-column">
+
+          <div class="column-title">
+            Technologies
+          </div>
+
+          <div class="rank-list">
+
+            <div
+              class="rank-row"
+              *ngFor="let item of topTechnologies; let i = index">
+
+              <span class="rank-number">
+                {{ i + 1 }}
+              </span>
+
+              <span class="rank-name">
+                {{ item.label }}
+              </span>
+
+              <span class="rank-count">
+                {{ formatCount(item.count) }}
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- MARKET GAPS -->
+
+    <section
+      class="trend-section"
+      *ngIf="topMissingSkills.length">
+
+      <div class="section-header">
+        <div>
+          <h2>Market Gaps</h2>
+          <p>Skills most frequently identified as missing.</p>
+        </div>
+      </div>
+
+      <div class="card chart-card gap-chart">
+        <app-bar-chart [items]="topMissingSkills"></app-bar-chart>
+      </div>
+
+      <div class="simple-card">
+
+        <div
+          class="gap-row"
+          *ngFor="let item of topMissingSkills; let i = index">
+
+          <span class="rank-number">
+            {{ i + 1 }}
+          </span>
+
+          <span class="rank-name">
+            {{ item.label }}
+          </span>
+
+          <span class="rank-count">
+            {{ formatCount(item.count) }}
+          </span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ROLES + EMPLOYERS -->
+
+    <section class="trend-section">
+
+      <div class="two-column">
+
+        <div>
+
+          <div class="section-header compact">
+            <div>
+              <h2>Most Common Job Roles</h2>
+            </div>
+          </div>
+
+          <div class="card chart-card">
+            <app-bar-chart [items]="topJobTitles" [maxItems]="6"></app-bar-chart>
+          </div>
+
+          <div class="simple-card">
+
+            <div
+              class="simple-row"
+              *ngFor="let item of topJobTitles; let i = index">
+
+              <span class="rank-number">
+                {{ i + 1 }}
+              </span>
+
+              <span class="rank-name">
+                {{ item.label }}
+              </span>
+
+              <span class="rank-count">
+                {{ formatCount(item.count) }}
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div>
+
+          <div class="section-header compact">
+            <div>
+              <h2>Most Analyzed Employers</h2>
+            </div>
+          </div>
+
+          <div class="card chart-card">
+            <app-bar-chart [items]="topCompanies" [maxItems]="6"></app-bar-chart>
+          </div>
+
+          <div class="simple-card">
+
+            <div
+              class="simple-row"
+              *ngFor="let item of topCompanies; let i = index">
+
+              <span class="rank-number">
+                {{ i + 1 }}
+              </span>
+
+              <span class="rank-name">
+                {{ item.label }}
+              </span>
+
+              <span class="rank-count">
+                {{ formatCount(item.count) }}
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </ng-container>
+
+</div>

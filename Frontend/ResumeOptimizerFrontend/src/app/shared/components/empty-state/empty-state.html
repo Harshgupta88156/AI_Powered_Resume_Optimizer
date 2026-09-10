@@ -1,0 +1,16 @@
+<div class="empty-state">
+
+  <div class="empty-icon">
+    <ng-content select="[icon]"></ng-content>
+  </div>
+
+  <h3>{{ title }}</h3>
+
+  <p *ngIf="message">{{ message }}</p>
+
+  <div class="empty-action">
+    <ng-content></ng-content>
+  </div>
+
+</div>
+

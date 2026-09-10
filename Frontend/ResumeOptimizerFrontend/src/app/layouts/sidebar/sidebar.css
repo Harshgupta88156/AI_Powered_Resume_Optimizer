@@ -1,0 +1,64 @@
+.sidebar {
+  width: 240px;
+  background: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  padding: 12px 0;
+  overflow-y: auto;
+  /* Was `height: 100vh`, which ignored the 64px header and pushed the last nav
+     item below the fold on every screen. The flex row already gives it the
+     correct height. */
+  height: 100%;
+  border-right: 1px solid var(--border);
+  transition: background-color .2s ease;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--sidebar-fg);
+  padding: 13px 22px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color .2s ease, color .2s ease;
+  border-left: 3px solid transparent;
+}
+
+.nav-link:hover {
+  background: var(--sidebar-active-bg);
+  color: var(--sidebar-active-fg);
+}
+
+.nav-link.active {
+  background: var(--sidebar-active-bg);
+  color: var(--sidebar-active-fg);
+  border-left-color: var(--sidebar-active-fg);
+  font-weight: 600;
+}
+
+.nav-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 64px;
+    left: 0;
+    bottom: 0;
+    height: auto;
+    z-index: 900;
+    transform: translateX(-100%);
+    transition: transform .25s ease;
+    box-shadow: 4px 0 16px rgba(0, 0, 0, .25);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+}

@@ -1,0 +1,96 @@
+<div class="page-container">
+
+  <div class="page-header">
+    <div>
+      <h1>Run Analysis</h1>
+      <p>Compare a resume against a job description to get an ATS and match score.</p>
+    </div>
+  </div>
+
+  <app-spinner *ngIf="loadingOptions()" label="Loading resumes and job descriptions..."></app-spinner>
+
+  <div class="alert-banner alert-error" *ngIf="!loadingOptions() && optionsError()">
+    {{ optionsError() }}
+  </div>
+
+  <div class="card" *ngIf="!loadingOptions() && !optionsError() && (resumes().length === 0 || jobDescriptions().length === 0)">
+    <app-empty-state
+      title="You need a resume and a job description first"
+      message="Upload at least one resume and add a job description before running an analysis."
+    >
+      <div class="page-actions">
+        <a routerLink="/resumes" class="btn-primary" style="text-decoration:none;">Upload Resume</a>
+        <a routerLink="/job-descriptions" class="btn-outline" style="text-decoration:none;">Add Job Description</a>
+      </div>
+    </app-empty-state>
+  </div>
+
+  <!-- ... existing code ... -->
+
+  <div class="card trigger-card" *ngIf="!loadingOptions() && !optionsError() && resumes().length > 0 && jobDescriptions().length > 0">
+
+    <div class="form-group">
+      <label class="form-label">Resume</label>
+      <select
+        class="form-select"
+        [value]="selectedResumeId() ?? ''"
+        (change)="onResumeChange($any($event.target).value)"
+      >
+        <option value="" disabled>Select a resume</option>
+        <option *ngFor="let r of resumes()" [value]="r.resumeId">{{ r.displayName }}</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Job Description</label>
+      <select
+        class="form-select"
+        [value]="selectedJdId() ?? ''"
+        (change)="onJobDescriptionChange($any($event.target).value)"
+      >
+        <option value="" disabled>Select a job description</option>
+        <option *ngFor="let jd of jobDescriptions()" [value]="jd.jobDescriptionId">
+          {{ jd.jobTitle || 'Untitled Role' }}{{ jd.company ? ' — ' + jd.company : '' }}
+        </option>
+      </select>
+    </div>
+
+    <div class="page-actions">
+      <button type="button" class="btn-primary" (click)="runAnalysis()" [disabled]="analyzing()">
+        {{ analyzing() ? 'Analyzing (this can take up to a couple minutes)...' : 'Run Analysis' }}
+      </button>
+    </div>
+
+    <!-- ... existing code ... -->
+    <app-spinner *ngIf="analyzing()" label="Our AI is comparing your resume with the job description..."></app-spinner>
+
+  </div>
+
+  <div class="card" *ngIf="!loadingRecent() && recentAnalyses().length > 0">
+    <div class="section-title">Recent Analyses</div>
+    <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Resume</th>
+          <th>Job Title</th>
+          <th>ATS</th>
+          <th>Match</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let a of recentAnalyses()" [routerLink]="['/analysis', a.analysisId]" style="cursor:pointer;">
+          <td>{{ a.resumeDisplayName }}</td>
+          <td>{{ a.jobTitle || '—' }}</td>
+          <td><span class="badge" [ngClass]="scoreClass(a.atsScore)">{{ a.atsScore ?? '—' }}</span></td>
+          <td><span class="badge" [ngClass]="scoreClass(a.matchScore)">{{ a.matchScore ?? '—' }}</span></td>
+          <td>{{ a.status }}</td>
+        </tr>
+      </tbody>
+    </table>
+      </div>
+  </div>
+
+</div>
+

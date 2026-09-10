@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Your resume analysis is ready</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f4f5f7;font-family:Arial,Helvetica,sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f5f7;padding:32px 0;">
+    <tr>
+        <td align="center">
+            <table role="presentation" width="600" cellpadding="0" cellspacing="0"
+                   style="background-color:#ffffff;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+
+                <!-- ===== HEADER ===== -->
+                <tr>
+                    <td style="background:linear-gradient(135deg,#059669,#047857);padding:28px 36px;">
+                        <h1 style="color:#ffffff;margin:0;font-size:22px;font-weight:700;">Analysis Complete</h1>
+                        <p style="color:#d1fae5;margin:6px 0 0;font-size:14px;">
+                            <span th:text="${resumeName}">Resume</span> &rarr;
+                            <span th:text="${jobDescriptionName}">Job Description</span>
+                        </p>
+                    </td>
+                </tr>
+
+                <!-- ===== GREETING ===== -->
+                <tr>
+                    <td style="padding:28px 36px 0;">
+                        <h2 style="margin:0;color:#111827;font-size:18px;">
+                            Hi <span th:text="${userName}">there</span>,
+                        </h2>
+                        <p style="color:#374151;font-size:14px;line-height:1.6;margin:8px 0 0;">
+                            Your resume has been analysed. Here's the full report.
+                        </p>
+                    </td>
+                </tr>
+
+                <!-- ===== SCORE CARDS ===== -->
+                <tr>
+                    <td style="padding:24px 36px 0;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td width="48%" style="vertical-align:top;" th:if="${atsScore != null}">
+                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                                           style="background-color:#ecfdf5;border-radius:8px;border:1px solid #d1fae5;">
+                                        <tr>
+                                            <td style="padding:18px 20px;text-align:center;">
+                                                <div style="color:#065f46;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">ATS Score</div>
+                                                <div style="color:#059669;font-size:36px;font-weight:800;line-height:1.2;margin-top:4px;">
+                                                    <span th:text="${atsScore}">85</span><span style="color:#065f46;font-size:16px;font-weight:500;"> / 100</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td width="4%">&nbsp;</td>
+                                <td width="48%" style="vertical-align:top;" th:if="${matchScore != null}">
+                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                                           style="background-color:#eff6ff;border-radius:8px;border:1px solid #dbeafe;">
+                                        <tr>
+                                            <td style="padding:18px 20px;text-align:center;">
+                                                <div style="color:#1e40af;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Match Score</div>
+                                                <div style="color:#2563eb;font-size:36px;font-weight:800;line-height:1.2;margin-top:4px;">
+                                                    <span th:text="${matchScore}">72</span><span style="color:#1e40af;font-size:16px;font-weight:500;"> / 100</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- ===== OVERALL SUMMARY ===== -->
+                <tr th:if="${overallSummary != null and !overallSummary.isEmpty()}">
+                    <td style="padding:24px 36px 0;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                               style="background-color:#f9fafb;border-radius:8px;border:1px solid #e5e7eb;">
+                            <tr>
+                                <td style="padding:18px 20px;">
+                                    <div style="color:#111827;font-size:14px;font-weight:700;margin-bottom:8px;">Summary</div>
+                                    <p style="color:#374151;font-size:13px;line-height:1.6;margin:0;" th:text="${overallSummary}">
+                                        Overall summary of the analysis will appear here.
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- ===== MATCHING SKILLS ===== -->
+                <tr th:if="${matchingSkills != null and !matchingSkills.isEmpty()}">
+                    <td style="padding:24px 36px 0;">
+                        <div style="color:#111827;font-size:14px;font-weight:700;margin-bottom:10px;">Matching Skills</div>
+                        <div>
+                            <span th:each="skill : ${matchingSkills}"
+                                  style="display:inline-block;padding:4px 12px;margin:0 6px 6px 0;
+                                         background-color:#ecfdf5;color:#065f46;border-radius:999px;
+                                         font-size:12px;font-weight:600;"
+                                  th:text="${skill}">Skill</span>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- ===== MISSING SKILLS ===== -->
+                <tr th:if="${missingSkills != null and !missingSkills.isEmpty()}">
+                    <td style="padding:24px 36px 0;">
+                        <div style="color:#111827;font-size:14px;font-weight:700;margin-bottom:10px;">Missing Skills</div>
+                        <div>
+                            <span th:each="skill : ${missingSkills}"
+                                  style="display:inline-block;padding:4px 12px;margin:0 6px 6px 0;
+                                         background-color:#fef2f2;color:#991b1b;border-radius:999px;
+                                         font-size:12px;font-weight:600;"
+                                  th:text="${skill}">Skill</span>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- ===== SUGGESTED SKILLS ===== -->
+                <tr th:if="${suggestedSkills != null and !suggestedSkills.isEmpty()}">
+                    <td style="padding:24px 36px 0;">
+                        <div style="color:#111827;font-size:14px;font-weight:700;margin-bottom:10px;">Suggested Skills to Add</div>
+                        <div>
+                            <span th:each="skill : ${suggestedSkills}"
+                                  style="display:inline-block;padding:4px 12px;margin:0 6px 6px 0;
+                                         background-color:#eff6ff;color:#1e40af;border-radius:999px;
+                                         font-size:12px;font-weight:600;"
+                                  th:text="${skill}">Skill</span>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- ===== STRENGTHS ===== -->
+                <tr th:if="${strengths != null and !strengths.isEmpty()}">
+                    <td style="padding:24px 36px 0;">
+                        <div style="color:#111827;font-size:14px;font-weight:700;margin-bottom:10px;">Strengths</div>
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                            <tr th:each="item : ${strengths}">
+                                <td style="padding:4px 0;color:#374151;font-size:13px;line-height:1.5;">
+                                    <span style="color:#059669;font-weight:700;margin-right:6px;">&#10003;</span>
+                                    <span th:text="${item}">Strength item</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- ===== WEAKNESSES ===== -->
+                <tr th:if="${weaknesses != null and !weaknesses.isEmpty()}">
+                    <td style="padding:24px 36px 0;">
+                        <div style="color:#111827;font-size:14px;font-weight:700;margin-bottom:10px;">Weaknesses</div>
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                            <tr th:each="item : ${weaknesses}">
+                                <td style="padding:4px 0;color:#374151;font-size:13px;line-height:1.5;">
+                                    <span style="color:#dc2626;font-weight:700;margin-right:6px;">&#10007;</span>
+                                    <span th:text="${item}">Weakness item</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- ===== SUGGESTIONS ===== -->
+                <tr th:if="${suggestions != null and !suggestions.isEmpty()}">
+                    <td style="padding:24px 36px 0;">
+                        <div style="color:#111827;font-size:14px;font-weight:700;margin-bottom:10px;">Suggestions</div>
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                            <tr th:each="item,stat : ${suggestions}">
+                                <td style="padding:5px 0;color:#374151;font-size:13px;line-height:1.5;">
+                                    <span style="display:inline-block;width:22px;height:22px;background-color:#eff6ff;color:#2563eb;
+                                                 border-radius:50%;text-align:center;line-height:22px;font-size:11px;font-weight:700;
+                                                 margin-right:8px;vertical-align:middle;"
+                                          th:text="${stat.count}">1</span>
+                                    <span th:text="${item}">Suggestion item</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- ===== VIEW ONLINE CTA ===== -->
+                <tr>
+                    <td style="padding:28px 36px 0;text-align:center;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;">
+                            <tr>
+                                <td style="border-radius:6px;background-color:#059669;">
+                                    <a th:href="${reportUrl}"
+                                       style="display:inline-block;padding:12px 28px;color:#ffffff;
+                                              text-decoration:none;font-weight:700;font-size:14px;">
+                                        View Full Report Online
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- ===== FOOTER ===== -->
+                <tr>
+                    <td style="padding:28px 36px 32px;text-align:center;">
+                        <p style="color:#9ca3af;font-size:12px;margin:0;line-height:1.5;">
+                            Keep optimizing &mdash; every iteration gets you closer to a perfect match.
+                        </p>
+                    </td>
+                </tr>
+
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<div class="page-container">
+
+  <div class="page-header">
+    <div>
+      <h1>Analysis History</h1>
+      <p>{{ totalElements() }} total analyses recorded.</p>
+    </div>
+    <div class="page-actions">
+      <button type="button" class="btn-outline" (click)="toggleFilters()">
+        {{ showFilters() ? 'Hide Filters' : 'Filters' }}
+      </button>
+      <button
+        type="button"
+        class="btn-primary"
+        [disabled]="selectedForCompare().length !== 2"
+        (click)="runCompare()"
+      >
+        Compare Selected ({{ selectedForCompare().length }}/2)
+      </button>
+    </div>
+  </div>
+
+  <div class="card filter-card" *ngIf="showFilters()">
+    <div class="filter-grid">
+      <div class="form-group">
+        <label class="form-label">Company</label>
+        <input type="text" class="form-input" [value]="filterCompany()" (input)="filterCompany.set($any($event.target).value)" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Job Title</label>
+        <input type="text" class="form-input" [value]="filterJobTitle()" (input)="filterJobTitle.set($any($event.target).value)" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-select" [value]="filterStatus()" (change)="filterStatus.set($any($event.target).value)">
+          <option value="">All</option>
+          <option value="PENDING">Pending</option>
+          <option value="PROCESSING">Processing</option>
+          <option value="COMPLETED">Completed</option>
+          <option value="FAILED">Failed</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">From</label>
+        <input type="date" class="form-input" [value]="filterFrom()" (input)="filterFrom.set($any($event.target).value)" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">To</label>
+        <input type="date" class="form-input" [value]="filterTo()" (input)="filterTo.set($any($event.target).value)" />
+      </div>
+    </div>
+    <div class="page-actions">
+      <button type="button" class="btn-primary" (click)="applyFilters()">Apply</button>
+      <button type="button" class="btn-ghost" (click)="clearFilters()">Clear</button>
+    </div>
+  </div>
+
+  <app-spinner *ngIf="loading()" label="Loading history..."></app-spinner>
+
+  <div class="alert-banner alert-error" *ngIf="!loading() && error()">
+    {{ error() }}
+  </div>
+
+  <div class="card" *ngIf="!loading() && !error() && items().length === 0">
+    <app-empty-state
+      title="No analyses found"
+      message="Run your first analysis or adjust your filters to see results here."
+    >
+      <a routerLink="/analysis" class="btn-primary" style="text-decoration:none;">Run Analysis</a>
+    </app-empty-state>
+  </div>
+
+  <div class="card" *ngIf="!loading() && !error() && items().length > 0" style="overflow-x:auto;">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Resume</th>
+          <th>Job Title</th>
+          <th>Company</th>
+          <th>ATS</th>
+          <th>Match</th>
+          <th>Status</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let item of items()"
+          [routerLink]="['/analysis', item.analysisId]"
+          style="cursor:pointer;"
+        >
+          <td (click)="toggleCompareSelection(item.analysisId, $event)">
+            <input type="checkbox" [checked]="selectedForCompare().includes(item.analysisId)" (click)="$event.stopPropagation()" (change)="toggleCompareSelection(item.analysisId, $event)" />
+          </td>
+          <td>{{ item.resume.displayName }} <span class="version-tag">v{{ item.resumeVersion.versionNumber }}</span></td>
+          <td>{{ item.jobDescription.jobTitle || '—' }}</td>
+          <td>{{ item.jobDescription.company || '—' }}</td>
+          <td><span class="badge" [ngClass]="scoreClass(item.atsScore)">{{ item.atsScore ?? '—' }}</span></td>
+          <td><span class="badge" [ngClass]="scoreClass(item.matchScore)">{{ item.matchScore ?? '—' }}</span></td>
+          <td><span class="badge" [ngClass]="statusClass(item.status)">{{ item.status }}</span></td>
+          <td>{{ item.analysisDate | date:'mediumDate' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <app-pagination
+    [page]="page()"
+    [totalPages]="totalPages()"
+    [totalElements]="totalElements()"
+    [pageSize]="pageSize"
+    (pageChange)="goToPage($event)"></app-pagination>
+
+</div>
+
+<div class="dialog-backdrop" *ngIf="comparison()" (click)="closeComparison()">
+  <div class="dialog-box compare-box" (click)="$event.stopPropagation()">
+    <div class="section-title-row">
+      <div class="section-title">Analysis Comparison</div>
+      <button type="button" class="btn-ghost btn-sm" (click)="closeComparison()">Close</button>
+    </div>
+
+    <ng-container *ngIf="comparison() as c">
+      <div class="compare-grid">
+        <div class="compare-col">
+          <h4>{{ c.left.resume.displayName }}</h4>
+          <p>{{ c.left.jobDescription.jobTitle || '—' }}</p>
+          <p>ATS: <strong>{{ c.left.atsScore ?? '—' }}</strong> &middot; Match: <strong>{{ c.left.matchScore ?? '—' }}</strong></p>
+        </div>
+        <div class="compare-col">
+          <h4>{{ c.right.resume.displayName }}</h4>
+          <p>{{ c.right.jobDescription.jobTitle || '—' }}</p>
+          <p>ATS: <strong>{{ c.right.atsScore ?? '—' }}</strong> &middot; Match: <strong>{{ c.right.matchScore ?? '—' }}</strong></p>
+        </div>
+      </div>
+
+      <div class="compare-deltas" *ngIf="c.delta">
+        <span class="badge badge-info" *ngIf="c.delta.atsDelta != null">ATS Δ {{ c.delta.atsDelta }}</span>
+        <span class="badge badge-info" *ngIf="c.delta.matchDelta != null">tak managerMatch Δ {{ c.delta.matchDelta }}</span>
+      </div>
+
+      <div class="compare-skills" *ngIf="c.missingSkills">
+        <div>
+          <strong>Missing skills added:</strong>
+          <span class="badge badge-danger" *ngFor="let s of c.missingSkills.added">{{ s }}</span>
+        </div>
+        <div>
+          <strong>Missing skills resolved:</strong>
+          <span class="badge badge-success" *ngFor="let s of c.missingSkills.removed">{{ s }}</span>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>
+
