@@ -1,36 +1,79 @@
 package com.ai_resume.ai_service.client;
 
-import com.ai_resume.ai_service.dto.ai.OllamaRequest;
-import com.ai_resume.ai_service.dto.ai.OllamaResponse;
-
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
+import java.util.List;
+import java.util.Map;
+
 @Component
-public class OllamaClient {
+public class GeminiClient {
 
     private final RestClient restClient;
 
-    @Value("${ollama.chat-endpoint}")
-    private String endpoint;
+    @Value("${gemini.api-key}")
+    private String apiKey;
 
-    public OllamaClient(RestClient restClient) {
+    @Value("${gemini.model}")
+    private String model;
 
+    @Value("${gemini.generate-endpoint}")
+    private String generateEndpoint;
+
+    public GeminiClient(RestClient restClient) {
         this.restClient = restClient;
-
     }
 
+    public String generate(String prompt) {
+        if (apiKey == null || apiKey.isBlank()) {
+            throw new IllegalStateException(
+                    "GEMINI_API_KEY is not configured"
+            );
+        }
 
-    public OllamaResponse chat(OllamaRequest request) {
+        Map<String, Object> requestBody = Map.of(
+                "contents", List.of(
+                        Map.of(
+                                "parts", List.of(
+                                        Map.of("text", prompt)
+                                )
+                        )
+                )
+        );
 
-        return restClient
+        JsonNode response = restClient
                 .post()
-                .uri(endpoint)
-                .body(request)
+                .uri(generateEndpoint, model)
+                .header("X-goog-api-key", apiKey)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(requestBody)
                 .retrieve()
-                .body(OllamaResponse.class);
+                .body(JsonNode.class);
 
+        if (response == null) {
+            throw new IllegalStateException(
+                    "Gemini returned an empty response"
+            );
+        }
+
+        JsonNode generatedText = response
+                .path("candidates")
+                .path(0)
+                .path("content")
+                .path("parts")
+                .path(0)
+                .path("text");
+
+        if (generatedText.isMissingNode() || generatedText.asText().isBlank()) {
+            throw new IllegalStateException(
+                    "Gemini response did not contain generated text: "
+                            + response
+            );
+        }
+
+        return generatedText.asText();
     }
-
 }

@@ -8,7 +8,7 @@ import org.springframework.web.client.RestClient;
 @Configuration
 public class RestClientConfig {
 
-    @Value("${ollama.base-url}")
+    @Value("${gemini.base-url}")
     private String baseUrl;
 
     @Bean

@@ -1,9 +1,6 @@
 package com.ai_resume.ai_service.service.impl;
 
-import com.ai_resume.ai_service.client.OllamaClient;
-import com.ai_resume.ai_service.dto.ai.Message;
-import com.ai_resume.ai_service.dto.ai.OllamaRequest;
-import com.ai_resume.ai_service.dto.ai.OllamaResponse;
+import com.ai_resume.ai_service.client.GeminiClient;
 import com.ai_resume.ai_service.dto.request.AiAnalysisRequest;
 import com.ai_resume.ai_service.dto.request.MarkdownGenerationRequest;
 import com.ai_resume.ai_service.dto.response.AiAnalysisResponse;
@@ -21,47 +18,65 @@ import java.util.List;
 @Slf4j
 public class OllamaService implements AiService {
 
-    private static final String PROMPT_FILE = "ai-analysis.txt";
-    private static final String PROMPT_VERSION = "prompt-v3";
-    private static final String MARKDOWN_PROMPT_FILE = "markdown-generation.txt";
+    private static final String ANALYSIS_PROMPT_FILE = "ai-analysis.txt";
+    private static final String ANALYSIS_PROMPT_VERSION = "prompt-v3";
+
+    private static final String MARKDOWN_PROMPT_FILE =
+            "markdown-generation.txt";
     private static final String MARKDOWN_PROMPT_VERSION = "prompt-v1";
 
     private final PromptLoader promptLoader;
-    private final OllamaClient ollamaClient;
+    private final GeminiClient geminiClient;
     private final ObjectMapper objectMapper;
 
-    @Value("${ollama.model}")
+    @Value("${gemini.model}")
     private String model;
 
     public OllamaService(
             PromptLoader promptLoader,
-            OllamaClient ollamaClient,
+            GeminiClient geminiClient,
             ObjectMapper objectMapper) {
-
         this.promptLoader = promptLoader;
-        this.ollamaClient = ollamaClient;
+        this.geminiClient = geminiClient;
         this.objectMapper = objectMapper;
     }
 
     @Override
     public AiAnalysisResponse analyzeResume(AiAnalysisRequest request) {
         try {
-            String template = promptLoader.loadPrompt(PROMPT_FILE);
+            String template = promptLoader.loadPrompt(
+                    ANALYSIS_PROMPT_FILE
+            );
+
             String prompt = template
-                    .replace("{{analysisId}}", String.valueOf(request.analysisId()))
-                    .replace("{{resumeText}}", request.resumeText())
-                    .replace("{{jobDescriptionText}}", request.jobDescriptionText())
-                    .replace("{{company}}", safeValue(request.company()))
-                    .replace("{{jobTitle}}", safeValue(request.jobTitle()));
+                    .replace(
+                            "{{analysisId}}",
+                            String.valueOf(request.analysisId())
+                    )
+                    .replace(
+                            "{{resumeText}}",
+                            request.resumeText()
+                    )
+                    .replace(
+                            "{{jobDescriptionText}}",
+                            request.jobDescriptionText()
+                    )
+                    .replace(
+                            "{{company}}",
+                            safeValue(request.company())
+                    )
+                    .replace(
+                            "{{jobTitle}}",
+                            safeValue(request.jobTitle())
+                    );
 
-            OllamaRequest ollamaRequest = new OllamaRequest(
-                    model,
-                    List.of(new Message("user", prompt)),
-                    false);
+            String generatedText = geminiClient.generate(prompt);
+            String aiJson = cleanJson(generatedText);
 
-            OllamaResponse response = ollamaClient.chat(ollamaRequest);
-            String aiJson = cleanJson(response.message().content());
-            AiAnalysisResponse parsed = objectMapper.readValue(aiJson, AiAnalysisResponse.class);
+            AiAnalysisResponse parsed = objectMapper.readValue(
+                    aiJson,
+                    AiAnalysisResponse.class
+            );
 
             return new AiAnalysisResponse(
                     parsed.atsScore(),
@@ -73,48 +88,87 @@ public class OllamaService implements AiService {
                     parsed.weaknesses(),
                     parsed.suggestedSkills(),
                     parsed.suggestions(),
-                    model + "/" + PROMPT_VERSION);
+                    model + "/" + ANALYSIS_PROMPT_VERSION
+            );
 
         } catch (Exception ex) {
-            throw new RuntimeException("AI Resume Analysis Failed", ex);
+            log.error("AI resume analysis failed", ex);
+            throw new RuntimeException(
+                    "AI Resume Analysis Failed",
+                    ex
+            );
         }
     }
 
     @Override
-    public MarkdownGenerationResponse generateMarkdownResume(MarkdownGenerationRequest request) {
+    public MarkdownGenerationResponse generateMarkdownResume(
+            MarkdownGenerationRequest request) {
         try {
-            String template = promptLoader.loadPrompt(MARKDOWN_PROMPT_FILE);
+            String template = promptLoader.loadPrompt(
+                    MARKDOWN_PROMPT_FILE
+            );
+
             String prompt = template
-                    .replace("{{analysisId}}", String.valueOf(request.analysisId()))
-                    .replace("{{resumeText}}", request.resumeText())
-                    .replace("{{jobDescriptionText}}", request.jobDescriptionText())
-                    .replace("{{company}}", safeValue(request.company()))
-                    .replace("{{jobTitle}}", safeValue(request.jobTitle()))
-                    .replace("{{missingSkills}}", joinOrNone(request.missingSkills()))
-                    .replace("{{suggestedSkills}}", joinOrNone(request.suggestedSkills()));
+                    .replace(
+                            "{{analysisId}}",
+                            String.valueOf(request.analysisId())
+                    )
+                    .replace(
+                            "{{resumeText}}",
+                            request.resumeText()
+                    )
+                    .replace(
+                            "{{jobDescriptionText}}",
+                            request.jobDescriptionText()
+                    )
+                    .replace(
+                            "{{company}}",
+                            safeValue(request.company())
+                    )
+                    .replace(
+                            "{{jobTitle}}",
+                            safeValue(request.jobTitle())
+                    )
+                    .replace(
+                            "{{missingSkills}}",
+                            joinOrNone(request.missingSkills())
+                    )
+                    .replace(
+                            "{{suggestedSkills}}",
+                            joinOrNone(request.suggestedSkills())
+                    );
 
-            log.info("Generating Markdown resume for analysis {} using model {}", request.analysisId(), model);
+            log.info(
+                    "Generating Markdown resume for analysis {} using Gemini {}",
+                    request.analysisId(),
+                    model
+            );
 
-            OllamaRequest ollamaRequest = new OllamaRequest(
-                    model,
-                    List.of(new Message("user", prompt)),
-                    false);
+            String generatedText = geminiClient.generate(prompt);
+            String markdown = cleanMarkdown(generatedText);
 
-            OllamaResponse response = ollamaClient.chat(ollamaRequest);
-            String markdown = cleanMarkdown(response.message().content());
-
-            log.info("Generated Markdown resume for analysis {} with {} characters",
-                    request.analysisId(), markdown.length());
+            log.info(
+                    "Generated Markdown resume for analysis {} with {} characters",
+                    request.analysisId(),
+                    markdown.length()
+            );
 
             return new MarkdownGenerationResponse(
                     request.analysisId(),
                     markdown,
-                    model + "/" + MARKDOWN_PROMPT_VERSION);
+                    model + "/" + MARKDOWN_PROMPT_VERSION
+            );
 
         } catch (Exception ex) {
-            log.error("AI Markdown Resume Generation Failed for analysis {}: {}",
-                    request.analysisId(), ex.getMessage(), ex);
-            throw new RuntimeException("AI Markdown Resume Generation Failed", ex);
+            log.error(
+                    "AI Markdown resume generation failed for analysis {}",
+                    request.analysisId(),
+                    ex
+            );
+            throw new RuntimeException(
+                    "AI Markdown Resume Generation Failed",
+                    ex
+            );
         }
     }
 
@@ -122,6 +176,7 @@ public class OllamaService implements AiService {
         if (values == null || values.isEmpty()) {
             return "None";
         }
+
         return String.join(", ", values);
     }
 
@@ -130,13 +185,17 @@ public class OllamaService implements AiService {
     }
 
     private String cleanJson(String response) {
-        response = response.trim();
-        response = response.replace("```json", "");
-        response = response.replace("```", "");
-        return response.trim();
+        if (response == null) {
+            return "";
+        }
+
+        return response
+                .trim()
+                .replace("```json", "")
+                .replace("```", "")
+                .trim();
     }
 
-    /** Strips markdown code fences some models wrap their output in and normalizes escaped markdown. */
     private String cleanMarkdown(String response) {
         if (response == null) {
             return "";
@@ -144,35 +203,40 @@ public class OllamaService implements AiService {
 
         response = response.trim();
 
-        // Some models return markdown as a JSON-style escaped string.
-        // Convert literal escape sequences into real formatting characters.
         response = response
                 .replace("\\r\\n", "\n")
                 .replace("\\n", "\n")
                 .replace("\\t", "\t")
                 .replace("\\\"", "\"");
 
-        response = response.replaceAll("(?i)^```markdown\\s*", "");
-        response = response.replaceAll("(?i)^```md\\s*", "");
+        response = response.replaceAll(
+                "(?i)^```markdown\\s*",
+                ""
+        );
 
-        // Only strip a leading/trailing fence line, not every ``` that may
-        // legitimately appear inside a code sample within the resume content.
+        response = response.replaceAll(
+                "(?i)^```md\\s*",
+                ""
+        );
+
         if (response.startsWith("```")) {
             int firstNewline = response.indexOf('\n');
+
             if (firstNewline != -1) {
                 response = response.substring(firstNewline + 1);
             }
         }
 
         if (response.endsWith("```")) {
-            response = response.substring(0, response.length() - 3);
+            response = response.substring(
+                    0,
+                    response.length() - 3
+            );
         }
 
-        response = response
+        return response
                 .replaceAll("(?m)[ \\t]+$", "")
                 .replaceAll("\\n{3,}", "\n\n")
                 .trim();
-
-        return response;
     }
 }
