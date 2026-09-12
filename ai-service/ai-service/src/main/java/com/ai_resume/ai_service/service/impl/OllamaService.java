@@ -92,9 +92,10 @@ public class OllamaService implements AiService {
             );
 
         } catch (Exception ex) {
-            log.error("AI resume analysis failed", ex);
+            String reason = ex.getMessage();
+            log.error("AI resume analysis failed: {}", reason, ex);
             throw new RuntimeException(
-                    "AI Resume Analysis Failed",
+                    "AI Resume Analysis Failed: " + reason,
                     ex
             );
         }
