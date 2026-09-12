@@ -91,8 +91,8 @@ public class DemoDataService {
                 .fileName(name.replace(' ', '-') + ".pdf")
                 .contentType("application/pdf")
                 .fileSizeBytes(24576L)
-                .cloudinaryUrl("https://demo.invalid/resumes/" + name.replace(' ', '-'))
-                .cloudinaryPublicId("demo/resumes/" + name.replace(' ', '-'))
+                .cloudinaryUrl(null)
+                .cloudinaryPublicId(null)
                 .extractedText(
                         "Demo candidate with professional experience in " + skills
                                 + ". Built production services, automated deployments, "
@@ -145,8 +145,8 @@ public class DemoDataService {
                 .source(JobDescriptionSource.TEXT)
                 .fileName("demo-" + jobTitle.replace(' ', '-') + ".txt")
                 .contentType("text/plain")
-                .cloudinaryUrl("https://demo.invalid/job-descriptions/" + jobTitle.replace(' ', '-'))
-                .cloudinaryPublicId("demo/job-descriptions/" + jobTitle.replace(' ', '-'))
+                .cloudinaryUrl(null)
+                .cloudinaryPublicId(null)
                 .extractedText(
                         "We are hiring a " + jobTitle + ". Required skills: " + requirements
                                 + " The role values communication, ownership, and measurable delivery."

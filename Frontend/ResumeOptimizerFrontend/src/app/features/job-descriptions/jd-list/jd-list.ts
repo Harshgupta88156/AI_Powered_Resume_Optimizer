@@ -78,7 +78,7 @@ export class JdList implements OnInit {
   /** Only PDFs render reliably in an iframe; Word docs must be downloaded. */
   canEmbedFile = computed(() => {
     const jd = this.viewTarget();
-    if (!jd?.cloudinaryUrl) return false;
+    if (!jd || !this.hasOriginalFile(jd)) return false;
     const type = (jd.contentType ?? '').toLowerCase();
     const name = (jd.fileName ?? '').toLowerCase();
     return type.includes('pdf') || name.endsWith('.pdf');
@@ -86,6 +86,15 @@ export class JdList implements OnInit {
 
   /** Text of an uploaded file is parser output, so it is read-only. */
   canEditText = computed(() => this.viewTarget()?.source === 'TEXT');
+
+  hasOriginalFile(jd: JobDescriptionResponse | null): boolean {
+    return !!jd
+      && jd.source === 'FILE'
+      && Number.isFinite(jd.jobDescriptionId)
+      && jd.jobDescriptionId > 0
+      && !!jd.cloudinaryUrl
+      && !jd.cloudinaryUrl.includes('demo.invalid');
+  }
 
   ngOnInit(): void {
     this.load();
@@ -102,6 +111,11 @@ export class JdList implements OnInit {
 
     // Already fetched once this session - don't re-request.
     if (jd.extractedText) {
+      return;
+    }
+
+    if (!Number.isFinite(jd.jobDescriptionId) || jd.jobDescriptionId <= 0) {
+      this.viewError.set('This job description has an invalid record ID and cannot be opened.');
       return;
     }
 
@@ -152,7 +166,7 @@ export class JdList implements OnInit {
 
   private loadOriginalFile(): void {
     const jd = this.viewTarget();
-    if (!jd || !this.canEmbedFile() || this.fileObjectUrl() || this.fileLoading()) return;
+    if (!jd || !this.hasOriginalFile(jd) || !this.canEmbedFile() || this.fileObjectUrl() || this.fileLoading()) return;
 
     this.fileLoading.set(true);
     this.viewError.set('');
@@ -179,7 +193,10 @@ export class JdList implements OnInit {
 
   openOriginalFile(): void {
     const jd = this.viewTarget();
-    if (!jd) return;
+    if (!jd || !this.hasOriginalFile(jd)) {
+      this.viewError.set('The original file is not available for this job description.');
+      return;
+    }
 
     const popup = window.open('', '_blank');
     if (!popup) {

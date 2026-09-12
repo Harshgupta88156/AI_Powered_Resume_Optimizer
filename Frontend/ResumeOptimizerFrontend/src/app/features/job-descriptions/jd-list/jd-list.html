@@ -145,7 +145,7 @@
     </div>
 
     <!-- Text / original file tabs -->
-    <div class="jd-tabs" *ngIf="!editing() && jd.cloudinaryUrl">
+    <div class="jd-tabs" *ngIf="!editing() && hasOriginalFile(jd)">
       <button type="button" [class.active]="viewTab() === 'text'" (click)="setViewTab('text')">Extracted text</button>
       <button type="button" [class.active]="viewTab() === 'file'" (click)="setViewTab('file')">Original file</button>
     </div>
@@ -243,7 +243,7 @@
           (click)="startEdit()">Edit / Rename</button>
 
         <button
-          *ngIf="!editing() && jd.cloudinaryUrl"
+          *ngIf="!editing() && hasOriginalFile(jd)"
           type="button"
           (click)="openOriginalFile()"
           class="btn-ghost btn-sm jd-analyze">Open original file</button>

@@ -6,14 +6,12 @@ import { extractErrorMessage } from '../../../core/utils/error.util';
 import { LabelCount, TimeSeriesPoint } from '../../../core/models/trends.model';
 import { Spinner } from '../../../shared/components/spinner/spinner';
 import { EmptyState } from '../../../shared/components/empty-state/empty-state';
-import { BarChart } from '../../../shared/components/bar-chart/bar-chart';
-import { DonutChart } from '../../../shared/components/donut-chart/donut-chart';
 import { LineChart, SeriesPoint } from '../../../shared/components/line-chart/line-chart';
 
 @Component({
   selector: 'app-trends-page',
   standalone: true,
-  imports: [CommonModule, Spinner, EmptyState, BarChart, DonutChart, LineChart],
+  imports: [CommonModule, Spinner, EmptyState, LineChart],
   templateUrl: './trends-page.html',
   styleUrl: './trends-page.css'
 })
@@ -134,4 +132,3 @@ export class TrendsPage implements OnInit {
     return new Intl.NumberFormat('en-US').format(value);
   }
 }
-

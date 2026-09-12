@@ -45,6 +45,10 @@ export class ResumeDetail implements OnInit {
     this.load();
   }
 
+  hasOriginalFile(url: string | null | undefined): boolean {
+    return !!url && !url.includes('demo.invalid');
+  }
+
   load(): void {
     this.loading.set(true);
     this.error.set('');
@@ -175,4 +179,3 @@ export class ResumeDetail implements OnInit {
     this.showDeleteConfirm.set(false);
   }
 }
-

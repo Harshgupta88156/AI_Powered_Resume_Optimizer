@@ -117,20 +117,6 @@
       </div>
 
 
-      <div class="chart-grid">
-
-        <div class="card chart-card">
-          <div class="section-title">Top skills by demand</div>
-          <app-bar-chart [items]="topSkills"></app-bar-chart>
-        </div>
-
-        <div class="card chart-card">
-          <div class="section-title">Technology share</div>
-          <app-donut-chart [items]="topTechnologies"></app-donut-chart>
-        </div>
-
-      </div>
-
       <div class="trend-card">
 
         <div class="trend-column">
@@ -215,10 +201,6 @@
         </div>
       </div>
 
-      <div class="card chart-card gap-chart">
-        <app-bar-chart [items]="topMissingSkills"></app-bar-chart>
-      </div>
-
       <div class="simple-card">
 
         <div
@@ -258,10 +240,6 @@
             </div>
           </div>
 
-          <div class="card chart-card">
-            <app-bar-chart [items]="topJobTitles" [maxItems]="6"></app-bar-chart>
-          </div>
-
           <div class="simple-card">
 
             <div
@@ -293,10 +271,6 @@
             <div>
               <h2>Most Analyzed Employers</h2>
             </div>
-          </div>
-
-          <div class="card chart-card">
-            <app-bar-chart [items]="topCompanies" [maxItems]="6"></app-bar-chart>
           </div>
 
           <div class="simple-card">

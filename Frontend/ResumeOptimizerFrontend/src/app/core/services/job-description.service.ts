@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Page } from '../models/api-response.model';
 import { JobDescriptionResponse } from '../models/job-description.model';
@@ -17,10 +17,16 @@ export class JobDescriptionService {
   }
 
   getById(id: number): Observable<JobDescriptionResponse> {
+    if (!Number.isFinite(id) || id <= 0) {
+      return throwError(() => new Error('A valid job description ID is required.'));
+    }
     return this.http.get<JobDescriptionResponse>(`${this.baseUrl}/${id}`);
   }
 
   getFile(id: number): Observable<Blob> {
+    if (!Number.isFinite(id) || id <= 0) {
+      return throwError(() => new Error('A valid job description ID is required.'));
+    }
     return this.http.get(`${this.baseUrl}/${id}/file`, { responseType: 'blob' });
   }
 
@@ -48,10 +54,16 @@ export class JobDescriptionService {
     id: number,
     changes: { company?: string; jobTitle?: string; text?: string }
   ): Observable<JobDescriptionResponse> {
+    if (!Number.isFinite(id) || id <= 0) {
+      return throwError(() => new Error('A valid job description ID is required.'));
+    }
     return this.http.put<JobDescriptionResponse>(`${this.baseUrl}/${id}`, changes);
   }
 
   delete(id: number): Observable<void> {
+    if (!Number.isFinite(id) || id <= 0) {
+      return throwError(() => new Error('A valid job description ID is required.'));
+    }
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 }

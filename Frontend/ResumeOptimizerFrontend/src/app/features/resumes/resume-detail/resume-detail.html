@@ -16,7 +16,12 @@
         <p>{{ r.fileName }} &middot; {{ r.totalVersions }} version(s) &middot; last updated {{ r.updatedAt | date:'medium' }}</p>
       </div>
       <div class="page-actions">
-        <a [href]="r.cloudinaryUrl" target="_blank" class="btn-outline" style="text-decoration:none;">View File</a>
+        <a
+          *ngIf="hasOriginalFile(r.cloudinaryUrl)"
+          [href]="r.cloudinaryUrl"
+          target="_blank"
+          class="btn-outline"
+          style="text-decoration:none;">View File</a>
         <a [routerLink]="['/analysis']" [queryParams]="{ resumeId: r.resumeId }" class="btn-primary" style="text-decoration:none;">Analyze</a>
         <button type="button" class="btn-ghost" (click)="requestDelete()">Delete</button>
       </div>
@@ -84,7 +89,15 @@
             <td>{{ v.fileName }}</td>
             <td>{{ (v.fileSizeBytes / 1024) | number:'1.0-0' }} KB</td>
             <td>{{ v.createdAt | date:'mediumDate' }}</td>
-            <td><a [href]="v.cloudinaryUrl" target="_blank" class="btn-ghost btn-sm" style="text-decoration:none;">View</a></td>
+            <td>
+              <a
+                *ngIf="hasOriginalFile(v.cloudinaryUrl)"
+                [href]="v.cloudinaryUrl"
+                target="_blank"
+                class="btn-ghost btn-sm"
+                style="text-decoration:none;">View</a>
+              <span *ngIf="!hasOriginalFile(v.cloudinaryUrl)" class="notes-empty">Demo file</span>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -102,4 +115,3 @@
   (confirm)="confirmDelete()"
   (cancel)="cancelDelete()"
 ></app-confirm-dialog>
-
