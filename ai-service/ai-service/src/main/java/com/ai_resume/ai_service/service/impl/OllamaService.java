@@ -70,7 +70,7 @@ public class OllamaService implements AiService {
                             safeValue(request.jobTitle())
                     );
 
-            String generatedText = geminiClient.generate(prompt);
+            String generatedText = geminiClient.generateJson(prompt);
             String aiJson = cleanJson(generatedText);
 
             AiAnalysisResponse parsed = objectMapper.readValue(
@@ -189,11 +189,19 @@ public class OllamaService implements AiService {
             return "";
         }
 
-        return response
+        String cleaned = response
                 .trim()
-                .replace("```json", "")
-                .replace("```", "")
+                .replaceFirst("(?is)^```json\\s*", "")
+                .replaceFirst("(?is)^```\\s*", "")
+                .replaceFirst("(?is)\\s*```$", "")
                 .trim();
+
+        int objectStart = cleaned.indexOf('{');
+        int objectEnd = cleaned.lastIndexOf('}');
+        if (objectStart >= 0 && objectEnd > objectStart) {
+            return cleaned.substring(objectStart, objectEnd + 1).trim();
+        }
+        return cleaned;
     }
 
     private String cleanMarkdown(String response) {

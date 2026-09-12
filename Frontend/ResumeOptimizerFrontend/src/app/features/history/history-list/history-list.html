@@ -73,34 +73,34 @@
   <div class="card" *ngIf="!loading() && !error() && items().length > 0" style="overflow-x:auto;">
     <table class="data-table">
       <thead>
-        <tr>
-          <th></th>
-          <th>Resume</th>
-          <th>Job Title</th>
-          <th>Company</th>
-          <th>ATS</th>
-          <th>Match</th>
-          <th>Status</th>
-          <th>Date</th>
-        </tr>
+      <tr>
+        <th></th>
+        <th>Resume</th>
+        <th>Job Title</th>
+        <th>Company</th>
+        <th>ATS</th>
+        <th>Match</th>
+        <th>Status</th>
+        <th>Date</th>
+      </tr>
       </thead>
       <tbody>
-        <tr
-          *ngFor="let item of items()"
-          [routerLink]="['/analysis', item.analysisId]"
-          style="cursor:pointer;"
-        >
-          <td (click)="toggleCompareSelection(item.analysisId, $event)">
-            <input type="checkbox" [checked]="selectedForCompare().includes(item.analysisId)" (click)="$event.stopPropagation()" (change)="toggleCompareSelection(item.analysisId, $event)" />
-          </td>
-          <td>{{ item.resume.displayName }} <span class="version-tag">v{{ item.resumeVersion.versionNumber }}</span></td>
-          <td>{{ item.jobDescription.jobTitle || '—' }}</td>
-          <td>{{ item.jobDescription.company || '—' }}</td>
-          <td><span class="badge" [ngClass]="scoreClass(item.atsScore)">{{ item.atsScore ?? '—' }}</span></td>
-          <td><span class="badge" [ngClass]="scoreClass(item.matchScore)">{{ item.matchScore ?? '—' }}</span></td>
-          <td><span class="badge" [ngClass]="statusClass(item.status)">{{ item.status }}</span></td>
-          <td>{{ item.analysisDate | date:'mediumDate' }}</td>
-        </tr>
+      <tr
+        *ngFor="let item of items()"
+        [routerLink]="['/analysis', item.analysisId]"
+        style="cursor:pointer;"
+      >
+        <td (click)="toggleCompareSelection(item.analysisId, $event)">
+          <input type="checkbox" [checked]="selectedForCompare().includes(item.analysisId)" (click)="$event.stopPropagation()" (change)="toggleCompareSelection(item.analysisId, $event)" />
+        </td>
+        <td>{{ item.resume.displayName }} <span class="version-tag">v{{ item.resumeVersion.versionNumber }}</span></td>
+        <td>{{ item.jobDescription.jobTitle || '—' }}</td>
+        <td>{{ item.jobDescription.company || '—' }}</td>
+        <td><span class="badge" [ngClass]="scoreClass(item.atsScore)">{{ item.atsScore ?? '—' }}</span></td>
+        <td><span class="badge" [ngClass]="scoreClass(item.matchScore)">{{ item.matchScore ?? '—' }}</span></td>
+        <td><span class="badge" [ngClass]="statusClass(item.status)">{{ item.status }}</span></td>
+        <td>{{ item.analysisDate | date:'mediumDate' }}</td>
+      </tr>
       </tbody>
     </table>
   </div>
@@ -122,35 +122,122 @@
     </div>
 
     <ng-container *ngIf="comparison() as c">
+
+      <!-- Comparison Header -->
       <div class="compare-grid">
+
+        <!-- Left Resume -->
         <div class="compare-col">
           <h4>{{ c.left.resume.displayName }}</h4>
-          <p>{{ c.left.jobDescription.jobTitle || '—' }}</p>
-          <p>ATS: <strong>{{ c.left.atsScore ?? '—' }}</strong> &middot; Match: <strong>{{ c.left.matchScore ?? '—' }}</strong></p>
+
+          <p>
+            {{ c.left.jobDescription.jobTitle || '—' }}
+          </p>
+
+          <p>
+            ATS:
+            <strong>{{ c.left.atsScore ?? '—' }}</strong>
+            &middot;
+            Match:
+            <strong>{{ c.left.matchScore ?? '—' }}</strong>
+          </p>
         </div>
+
+        <!-- Right Resume -->
         <div class="compare-col">
           <h4>{{ c.right.resume.displayName }}</h4>
-          <p>{{ c.right.jobDescription.jobTitle || '—' }}</p>
-          <p>ATS: <strong>{{ c.right.atsScore ?? '—' }}</strong> &middot; Match: <strong>{{ c.right.matchScore ?? '—' }}</strong></p>
+
+          <p>
+            {{ c.right.jobDescription.jobTitle || '—' }}
+          </p>
+
+          <p>
+            ATS:
+            <strong>{{ c.right.atsScore ?? '—' }}</strong>
+            &middot;
+            Match:
+            <strong>{{ c.right.matchScore ?? '—' }}</strong>
+          </p>
         </div>
+
       </div>
 
+
+      <!-- Score Deltas -->
       <div class="compare-deltas" *ngIf="c.delta">
-        <span class="badge badge-info" *ngIf="c.delta.atsDelta != null">ATS Δ {{ c.delta.atsDelta }}</span>
-        <span class="badge badge-info" *ngIf="c.delta.matchDelta != null">tak managerMatch Δ {{ c.delta.matchDelta }}</span>
+
+    <span
+      class="badge badge-info"
+      *ngIf="c.delta.atsDelta != null"
+    >
+      ATS Δ {{ c.delta.atsDelta }}
+    </span>
+
+        <span
+          class="badge badge-info"
+          *ngIf="c.delta.matchDelta != null"
+        >
+      Manager Match Δ {{ c.delta.matchDelta }}
+    </span>
+
       </div>
 
+
+      <!-- Missing Skills -->
       <div class="compare-skills" *ngIf="c.missingSkills">
-        <div>
+
+        <div class="skill-group">
           <strong>Missing skills added:</strong>
-          <span class="badge badge-danger" *ngFor="let s of c.missingSkills.added">{{ s }}</span>
+
+          <span
+            class="badge badge-danger"
+            *ngFor="let skill of c.missingSkills.added"
+          >
+        {{ skill }}
+      </span>
         </div>
-        <div>
+
+        <div class="skill-group">
           <strong>Missing skills resolved:</strong>
-          <span class="badge badge-success" *ngFor="let s of c.missingSkills.removed">{{ s }}</span>
+
+          <span
+            class="badge badge-success"
+            *ngFor="let skill of c.missingSkills.removed"
+          >
+        {{ skill }}
+      </span>
         </div>
+
       </div>
+
+
+      <!-- Suggested Skills -->
+      <div class="compare-skills" *ngIf="c.suggestedSkills">
+
+        <div class="skill-group">
+          <strong>Suggested skills added:</strong>
+
+          <span
+            class="badge badge-danger"
+            *ngFor="let skill of c.suggestedSkills.added"
+          >
+        {{ skill }}
+      </span>
+        </div>
+
+        <div class="skill-group">
+          <strong>Suggested skills resolved:</strong>
+
+          <span
+            class="badge badge-success"
+            *ngFor="let skill of c.suggestedSkills.removed"
+          >
+        {{ skill }}
+      </span>
+        </div>
+
+      </div>
+
     </ng-container>
   </div>
 </div>
-

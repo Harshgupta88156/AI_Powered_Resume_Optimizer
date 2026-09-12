@@ -41,6 +41,31 @@
       </select>
     </div>
 
+    <div class="form-group" *ngIf="selectedResumeId() != null">
+      <label class="form-label">Resume version</label>
+
+      <app-spinner *ngIf="loadingVersions()" label="Loading versions..."></app-spinner>
+
+      <div class="alert-banner alert-error" *ngIf="!loadingVersions() && versionsError()">
+        {{ versionsError() }}
+      </div>
+
+      <select
+        *ngIf="!loadingVersions() && !versionsError() && resumeVersions().length > 0"
+        class="form-select"
+        [value]="selectedVersionId() ?? ''"
+        (change)="onVersionChange($any($event.target).value)"
+      >
+        <option *ngFor="let v of resumeVersions()" [value]="v.resumeVersionId">
+          v{{ v.versionNumber }} — {{ v.fileName }} ({{ v.createdAt | date:'mediumDate' }})
+        </option>
+      </select>
+
+      <p class="form-hint" *ngIf="!loadingVersions() && !versionsError() && resumeVersions().length === 0">
+        This resume has no uploaded versions yet.
+      </p>
+    </div>
+
     <div class="form-group">
       <label class="form-label">Job Description</label>
       <select
@@ -69,28 +94,29 @@
   <div class="card" *ngIf="!loadingRecent() && recentAnalyses().length > 0">
     <div class="section-title">Recent Analyses</div>
     <div class="table-responsive">
-    <table class="data-table">
-      <thead>
+      <table class="data-table">
+        <thead>
         <tr>
           <th>Resume</th>
+          <th>Version</th>
           <th>Job Title</th>
           <th>ATS</th>
           <th>Match</th>
           <th>Status</th>
         </tr>
-      </thead>
-      <tbody>
+        </thead>
+        <tbody>
         <tr *ngFor="let a of recentAnalyses()" [routerLink]="['/analysis', a.analysisId]" style="cursor:pointer;">
           <td>{{ a.resumeDisplayName }}</td>
+          <td><span class="badge badge-info">v{{ a.resumeVersionNumber }}</span></td>
           <td>{{ a.jobTitle || '—' }}</td>
           <td><span class="badge" [ngClass]="scoreClass(a.atsScore)">{{ a.atsScore ?? '—' }}</span></td>
           <td><span class="badge" [ngClass]="scoreClass(a.matchScore)">{{ a.matchScore ?? '—' }}</span></td>
           <td>{{ a.status }}</td>
         </tr>
-      </tbody>
-    </table>
-      </div>
+        </tbody>
+      </table>
+    </div>
   </div>
 
 </div>
-

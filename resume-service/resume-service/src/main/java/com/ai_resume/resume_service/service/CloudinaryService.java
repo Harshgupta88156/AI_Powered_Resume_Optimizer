@@ -5,6 +5,11 @@ import com.ai_resume.resume_service.exception.FileProcessingException;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import java.nio.charset.StandardCharsets;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +22,9 @@ import org.springframework.stereotype.Service;
 public class CloudinaryService {
 
     private final Cloudinary cloudinary;
+    private final HttpClient httpClient = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(10))
+            .build();
 
     /**
      * Uploads already-read file bytes.
@@ -70,6 +78,51 @@ public class CloudinaryService {
         } catch (Exception ex) {
             log.warn("ORPHANED ASSET: failed to delete Cloudinary resource '{}' — "
                     + "it must be cleaned up manually", publicId, ex);
+        }
+    }
+
+    /**
+     * Downloads a previously uploaded asset through the backend so the browser
+     * receives the correct content type and the user's authorization is checked
+     * by the API before the asset is returned.
+     */
+    public byte[] download(String secureUrl) {
+        if (secureUrl == null || secureUrl.isBlank()) {
+            throw new FileProcessingException("The original file is not available", null);
+        }
+
+        URI uri;
+        try {
+            uri = URI.create(secureUrl);
+        } catch (IllegalArgumentException ex) {
+            throw new FileProcessingException("The stored original file URL is invalid", ex);
+        }
+
+        if (!"https".equalsIgnoreCase(uri.getScheme())
+                || !"res.cloudinary.com".equalsIgnoreCase(uri.getHost())) {
+            throw new FileProcessingException("The stored original file URL is not trusted", null);
+        }
+
+        try {
+            HttpResponse<byte[]> response = httpClient.send(
+                    HttpRequest.newBuilder(uri)
+                            .timeout(Duration.ofSeconds(30))
+                            .GET()
+                            .build(),
+                    HttpResponse.BodyHandlers.ofByteArray());
+
+            if (response.statusCode() < 200 || response.statusCode() >= 300) {
+                throw new FileProcessingException(
+                        "Cloudinary returned HTTP " + response.statusCode()
+                                + " while loading the original file",
+                        null);
+            }
+            return response.body();
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new FileProcessingException("Loading the original file was interrupted", ex);
+        } catch (java.io.IOException ex) {
+            throw new FileProcessingException("Could not load the original file", ex);
         }
     }
 
@@ -131,4 +184,3 @@ private String uniquePublicId(String name) {
             + extension;
 }
 }
-

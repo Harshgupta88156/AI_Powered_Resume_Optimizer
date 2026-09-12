@@ -13,7 +13,7 @@ import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm
 const ACCEPTED_TYPES = [
   'application/pdf',
   'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 ];
 
 @Component({
@@ -21,10 +21,9 @@ const ACCEPTED_TYPES = [
   standalone: true,
   imports: [CommonModule, RouterLink, Spinner, EmptyState, ConfirmDialog, Pagination],
   templateUrl: './resume-list.html',
-  styleUrl: './resume-list.css'
+  styleUrl: './resume-list.css',
 })
 export class ResumeList implements OnInit {
-
   private resumeService = inject(ResumeService);
   private toast = inject(ToastService);
 
@@ -35,7 +34,7 @@ export class ResumeList implements OnInit {
   page = signal(0);
   totalPages = signal(0);
   totalElements = signal(0);
-  readonly pageSize = 20;
+  readonly pageSize = 8;
 
   showUploadForm = signal(false);
   selectedFile = signal<File | null>(null);
@@ -54,7 +53,7 @@ export class ResumeList implements OnInit {
     this.loading.set(true);
     this.error.set('');
 
-    this.resumeService.list(page).subscribe({
+    this.resumeService.list(page, this.pageSize).subscribe({
       next: (res) => {
         this.resumes.set(res.content);
         this.page.set(res.number);
@@ -65,12 +64,12 @@ export class ResumeList implements OnInit {
       error: (err) => {
         this.error.set(extractErrorMessage(err, 'Could not load your resumes.'));
         this.loading.set(false);
-      }
+      },
     });
   }
 
   toggleUploadForm(): void {
-    this.showUploadForm.update(v => !v);
+    this.showUploadForm.update((v) => !v);
     this.selectedFile.set(null);
     this.displayNameInput.set('');
     this.fileError.set('');
@@ -117,12 +116,12 @@ export class ResumeList implements OnInit {
         this.uploading.set(false);
         this.toast.success('Resume uploaded successfully.');
         this.toggleUploadForm();
-        this.resumes.update(list => [resume, ...list]);
+        this.resumes.update((list) => [resume, ...list]);
       },
       error: (err) => {
         this.uploading.set(false);
         this.toast.error(extractErrorMessage(err, 'Upload failed. Please try again.'));
-      }
+      },
     });
   }
 
@@ -142,14 +141,16 @@ export class ResumeList implements OnInit {
       next: () => {
         this.deleting.set(false);
         this.deleteTarget.set(null);
-        this.resumes.update(list => list.filter(r => r.resumeId !== target.resumeId));
+        this.resumes.update((list) => list.filter((r) => r.resumeId !== target.resumeId));
         this.toast.success('Resume deleted.');
       },
       error: (err) => {
         this.deleting.set(false);
         this.deleteTarget.set(null);
-        this.toast.error(extractErrorMessage(err, 'Could not delete this resume. It may have existing analyses.'));
-      }
+        this.toast.error(
+          extractErrorMessage(err, 'Could not delete this resume. It may have existing analyses.'),
+        );
+      },
     });
   }
 
@@ -162,4 +163,3 @@ export class ResumeList implements OnInit {
     this.load(page);
   }
 }
-

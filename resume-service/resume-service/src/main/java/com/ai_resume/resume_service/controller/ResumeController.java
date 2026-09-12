@@ -18,6 +18,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -145,6 +147,27 @@ public class ResumeController {
     public ResponseEntity<JobDescriptionResponse> getJobDescriptionById(
             @RequestHeader(USER_ID_HEADER) Long userId, @PathVariable Long id) {
         return ResponseEntity.ok(resumeService.getJobDescriptionById(userId, id));
+    }
+
+    @GetMapping("/job-descriptions/{id}/file")
+    public ResponseEntity<byte[]> downloadJobDescription(
+            @RequestHeader(USER_ID_HEADER) Long userId, @PathVariable Long id) {
+        ResumeService.DownloadedFile file = resumeService.downloadJobDescription(userId, id);
+        MediaType contentType = MediaType.APPLICATION_OCTET_STREAM;
+        if (file.contentType() != null && !file.contentType().isBlank()) {
+            contentType = MediaType.parseMediaType(file.contentType());
+        }
+
+        return ResponseEntity.ok()
+                .contentType(contentType)
+                .contentLength(file.content().length)
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        ContentDisposition.inline()
+                                .filename(file.fileName())
+                                .build()
+                                .toString())
+                .body(file.content());
     }
 
     /**

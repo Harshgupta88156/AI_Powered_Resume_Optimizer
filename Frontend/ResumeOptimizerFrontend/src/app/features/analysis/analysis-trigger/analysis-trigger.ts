@@ -6,7 +6,7 @@ import { JobDescriptionService } from '../../../core/services/job-description.se
 import { AnalysisService } from '../../../core/services/analysis.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { extractErrorMessage } from '../../../core/utils/error.util';
-import { ResumeResponse } from '../../../core/models/resume.model';
+import { ResumeResponse, ResumeVersionResponse } from '../../../core/models/resume.model';
 import { JobDescriptionResponse } from '../../../core/models/job-description.model';
 import { AnalysisResponse } from '../../../core/models/analysis.model';
 import { Spinner } from '../../../shared/components/spinner/spinner';
@@ -17,10 +17,9 @@ import { EmptyState } from '../../../shared/components/empty-state/empty-state';
   standalone: true,
   imports: [CommonModule, RouterLink, Spinner, EmptyState],
   templateUrl: './analysis-trigger.html',
-  styleUrl: './analysis-trigger.css'
+  styleUrl: './analysis-trigger.css',
 })
 export class AnalysisTrigger implements OnInit {
-
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private resumeService = inject(ResumeService);
@@ -37,6 +36,15 @@ export class AnalysisTrigger implements OnInit {
   selectedJdId = signal<number | null>(null);
   analyzing = signal(false);
 
+  // ── Resume version selection ──────────────────────────────────────────
+  // A resume can have several uploaded versions. The analysis should run
+  // against a specific one rather than always defaulting to the latest, so
+  // once a resume is picked we load its versions and let the user choose.
+  resumeVersions = signal<ResumeVersionResponse[]>([]);
+  selectedVersionId = signal<number | null>(null);
+  loadingVersions = signal(false);
+  versionsError = signal('');
+
   loadingRecent = signal(true);
   recentAnalyses = signal<AnalysisResponse[]>([]);
 
@@ -48,6 +56,34 @@ export class AnalysisTrigger implements OnInit {
 
     this.loadOptions();
     this.loadRecent();
+
+    // If a resume arrived via query params, its versions still need loading.
+    const initialResumeId = this.selectedResumeId();
+    if (initialResumeId != null) {
+      this.loadVersions(initialResumeId);
+    }
+  }
+
+  /** Fetches the versions for the given resume and defaults to its latest one. */
+  private loadVersions(resumeId: number): void {
+    this.loadingVersions.set(true);
+    this.versionsError.set('');
+    this.resumeVersions.set([]);
+    this.selectedVersionId.set(null);
+
+    this.resumeService.listVersions(resumeId).subscribe({
+      next: (versions) => {
+        const sorted = [...versions].sort((a, b) => b.versionNumber - a.versionNumber);
+        this.resumeVersions.set(sorted);
+        // Default to the latest version (highest version number).
+        this.selectedVersionId.set(sorted[0]?.resumeVersionId ?? null);
+        this.loadingVersions.set(false);
+      },
+      error: (err) => {
+        this.versionsError.set(extractErrorMessage(err, 'Could not load resume versions.'));
+        this.loadingVersions.set(false);
+      },
+    });
   }
 
   loadOptions(): void {
@@ -65,13 +101,13 @@ export class AnalysisTrigger implements OnInit {
           error: (err) => {
             this.optionsError.set(extractErrorMessage(err, 'Could not load job descriptions.'));
             this.loadingOptions.set(false);
-          }
+          },
         });
       },
       error: (err) => {
         this.optionsError.set(extractErrorMessage(err, 'Could not load resumes.'));
         this.loadingOptions.set(false);
-      }
+      },
     });
   }
 
@@ -82,7 +118,7 @@ export class AnalysisTrigger implements OnInit {
         this.recentAnalyses.set(res.content);
         this.loadingRecent.set(false);
       },
-      error: () => this.loadingRecent.set(false)
+      error: () => this.loadingRecent.set(false),
     });
   }
 
@@ -95,23 +131,43 @@ export class AnalysisTrigger implements OnInit {
       return;
     }
 
+    const resumeVersionId = this.selectedVersionId();
+    if (this.resumeVersions().length > 0 && resumeVersionId == null) {
+      this.toast.error('Please select a resume version.');
+      return;
+    }
+
     this.analyzing.set(true);
 
-    this.analysisService.trigger({ resumeId, jobDescriptionId }).subscribe({
-      next: (analysis) => {
-        this.analyzing.set(false);
-        this.toast.success('Analysis complete!');
-        this.router.navigate(['/analysis', analysis.analysisId]);
-      },
-      error: (err) => {
-        this.analyzing.set(false);
-        this.toast.error(extractErrorMessage(err, 'Analysis failed. Please try again.'));
-      }
-    });
+    this.analysisService
+      .trigger({ resumeId, jobDescriptionId, resumeVersionId: resumeVersionId ?? undefined })
+      .subscribe({
+        next: (analysis) => {
+          this.analyzing.set(false);
+          this.toast.success('Analysis complete!');
+          this.router.navigate(['/analysis', analysis.analysisId]);
+        },
+        error: (err) => {
+          this.analyzing.set(false);
+          this.toast.error(extractErrorMessage(err, 'Analysis failed. Please try again.'));
+        },
+      });
   }
 
   onResumeChange(value: string): void {
-    this.selectedResumeId.set(value ? Number(value) : null);
+    const resumeId = value ? Number(value) : null;
+    this.selectedResumeId.set(resumeId);
+
+    if (resumeId != null) {
+      this.loadVersions(resumeId);
+    } else {
+      this.resumeVersions.set([]);
+      this.selectedVersionId.set(null);
+    }
+  }
+
+  onVersionChange(value: string): void {
+    this.selectedVersionId.set(value ? Number(value) : null);
   }
 
   onJobDescriptionChange(value: string): void {
@@ -125,4 +181,3 @@ export class AnalysisTrigger implements OnInit {
     return 'badge-danger';
   }
 }
-

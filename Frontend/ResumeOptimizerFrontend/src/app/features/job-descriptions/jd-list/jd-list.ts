@@ -18,10 +18,9 @@ type InputMode = 'file' | 'text';
   standalone: true,
   imports: [CommonModule, RouterLink, Spinner, EmptyState, ConfirmDialog, Pagination],
   templateUrl: './jd-list.html',
-  styleUrl: './jd-list.css'
+  styleUrl: './jd-list.css',
 })
 export class JdList implements OnInit {
-
   private jdService = inject(JobDescriptionService);
   private toast = inject(ToastService);
 
@@ -32,7 +31,7 @@ export class JdList implements OnInit {
   page = signal(0);
   totalPages = signal(0);
   totalElements = signal(0);
-  readonly pageSize = 20;
+  readonly pageSize = 4;
 
   showForm = signal(false);
   inputMode = signal<InputMode>('text');
@@ -51,6 +50,8 @@ export class JdList implements OnInit {
   viewTarget = signal<JobDescriptionResponse | null>(null);
   viewLoading = signal(false);
   viewError = signal('');
+  fileLoading = signal(false);
+  fileObjectUrl = signal<string | null>(null);
 
   /** 'text' shows the extracted text; 'file' embeds the original document. */
   viewTab = signal<'text' | 'file'>('text');
@@ -70,9 +71,8 @@ export class JdList implements OnInit {
    * defeat the protection rather than satisfy it.
    */
   safeFileUrl = computed<SafeResourceUrl | null>(() => {
-    const url = this.viewTarget()?.cloudinaryUrl;
-    if (!url || !/^https:\/\//i.test(url)) return null;
-    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+    const url = this.fileObjectUrl();
+    return url ? this.sanitizer.bypassSecurityTrustResourceUrl(url) : null;
   });
 
   /** Only PDFs render reliably in an iframe; Word docs must be downloaded. */
@@ -97,6 +97,8 @@ export class JdList implements OnInit {
 
     this.viewTarget.set(jd);
     this.viewError.set('');
+    this.viewTab.set('text');
+    this.releaseFileUrl();
 
     // Already fetched once this session - don't re-request.
     if (jd.extractedText) {
@@ -111,16 +113,16 @@ export class JdList implements OnInit {
         this.viewLoading.set(false);
 
         // Cache onto the list row so reopening is instant.
-        this.jobDescriptions.update(list =>
-          list.map(item =>
-            item.jobDescriptionId === full.jobDescriptionId ? { ...item, ...full } : item
-          )
+        this.jobDescriptions.update((list) =>
+          list.map((item) =>
+            item.jobDescriptionId === full.jobDescriptionId ? { ...item, ...full } : item,
+          ),
         );
       },
       error: (err) => {
         this.viewLoading.set(false);
         this.viewError.set(extractErrorMessage(err, 'Could not load this job description.'));
-      }
+      },
     });
   }
 
@@ -133,6 +135,7 @@ export class JdList implements OnInit {
   }
 
   closeView(): void {
+    this.releaseFileUrl();
     this.viewTarget.set(null);
     this.viewError.set('');
     this.viewLoading.set(false);
@@ -142,6 +145,67 @@ export class JdList implements OnInit {
 
   setViewTab(tab: 'text' | 'file'): void {
     this.viewTab.set(tab);
+    if (tab === 'file') {
+      this.loadOriginalFile();
+    }
+  }
+
+  private loadOriginalFile(): void {
+    const jd = this.viewTarget();
+    if (!jd || !this.canEmbedFile() || this.fileObjectUrl() || this.fileLoading()) return;
+
+    this.fileLoading.set(true);
+    this.viewError.set('');
+    this.jdService.getFile(jd.jobDescriptionId).subscribe({
+      next: (blob) => {
+        this.fileObjectUrl.set(URL.createObjectURL(blob));
+        this.fileLoading.set(false);
+      },
+      error: (err) => {
+        this.fileLoading.set(false);
+        this.viewError.set(extractErrorMessage(err, 'Could not load the original file.'));
+      },
+    });
+  }
+
+  private releaseFileUrl(): void {
+    const url = this.fileObjectUrl();
+    if (url) {
+      URL.revokeObjectURL(url);
+      this.fileObjectUrl.set(null);
+    }
+    this.fileLoading.set(false);
+  }
+
+  openOriginalFile(): void {
+    const jd = this.viewTarget();
+    if (!jd) return;
+
+    const popup = window.open('', '_blank');
+    if (!popup) {
+      this.toast.error('Please allow pop-ups to open the original file.');
+      return;
+    }
+
+    if (this.fileObjectUrl()) {
+      popup.location.href = this.fileObjectUrl()!;
+      return;
+    }
+
+    this.fileLoading.set(true);
+    this.jdService.getFile(jd.jobDescriptionId).subscribe({
+      next: (blob) => {
+        const url = URL.createObjectURL(blob);
+        this.fileObjectUrl.set(url);
+        this.fileLoading.set(false);
+        popup.location.href = url;
+      },
+      error: (err) => {
+        this.fileLoading.set(false);
+        popup.close();
+        this.viewError.set(extractErrorMessage(err, 'Could not load the original file.'));
+      },
+    });
   }
 
   startEdit(): void {
@@ -170,7 +234,7 @@ export class JdList implements OnInit {
 
     const changes: { company?: string; jobTitle?: string; text?: string } = {
       company: this.editCompany().trim(),
-      jobTitle: title
+      jobTitle: title,
     };
 
     // Only send text for TEXT-sourced entries; the backend rejects it for
@@ -192,10 +256,10 @@ export class JdList implements OnInit {
         this.editing.set(false);
         this.viewTarget.set(updated);
 
-        this.jobDescriptions.update(list =>
-          list.map(item =>
-            item.jobDescriptionId === updated.jobDescriptionId ? { ...item, ...updated } : item
-          )
+        this.jobDescriptions.update((list) =>
+          list.map((item) =>
+            item.jobDescriptionId === updated.jobDescriptionId ? { ...item, ...updated } : item,
+          ),
         );
 
         this.toast.success('Job description updated.');
@@ -203,7 +267,7 @@ export class JdList implements OnInit {
       error: (err) => {
         this.savingEdit.set(false);
         this.toast.error(extractErrorMessage(err, 'Could not update this job description.'));
-      }
+      },
     });
   }
 
@@ -211,7 +275,8 @@ export class JdList implements OnInit {
     const text = this.viewTarget()?.extractedText;
     if (!text) return;
 
-    navigator.clipboard?.writeText(text)
+    navigator.clipboard
+      ?.writeText(text)
       .then(() => this.toast.success('Job description copied.'))
       .catch(() => this.toast.error('Could not copy to clipboard.'));
   }
@@ -229,7 +294,7 @@ export class JdList implements OnInit {
     this.loading.set(true);
     this.error.set('');
 
-    this.jdService.list(page).subscribe({
+    this.jdService.list(page, this.pageSize).subscribe({
       next: (res) => {
         this.jobDescriptions.set(res.content);
         this.page.set(res.number);
@@ -240,12 +305,12 @@ export class JdList implements OnInit {
       error: (err) => {
         this.error.set(extractErrorMessage(err, 'Could not load job descriptions.'));
         this.loading.set(false);
-      }
+      },
     });
   }
 
   toggleForm(): void {
-    this.showForm.update(v => !v);
+    this.showForm.update((v) => !v);
     this.resetForm();
   }
 
@@ -283,7 +348,7 @@ export class JdList implements OnInit {
   submit(): void {
     const company = this.company() || undefined;
     const jobTitle = this.jobTitle() || undefined;
-    if(company === undefined || jobTitle === undefined) {
+    if (company === undefined || jobTitle === undefined) {
       this.toast.error('Please enter both company and job title.');
       return;
     }
@@ -295,7 +360,7 @@ export class JdList implements OnInit {
       this.submitting.set(true);
       this.jdService.createFromText(this.textContent(), company, jobTitle).subscribe({
         next: (jd) => this.handleCreateSuccess(jd),
-        error: (err) => this.handleCreateError(err)
+        error: (err) => this.handleCreateError(err),
       });
     } else {
       const file = this.selectedFile();
@@ -306,14 +371,14 @@ export class JdList implements OnInit {
       this.submitting.set(true);
       this.jdService.createFromFile(file, company, jobTitle).subscribe({
         next: (jd) => this.handleCreateSuccess(jd),
-        error: (err) => this.handleCreateError(err)
+        error: (err) => this.handleCreateError(err),
       });
     }
   }
 
   private handleCreateSuccess(jd: JobDescriptionResponse): void {
     this.submitting.set(false);
-    this.jobDescriptions.update(list => [jd, ...list]);
+    this.jobDescriptions.update((list) => [jd, ...list]);
     this.toast.success('Job description added.');
     this.toggleForm();
   }
@@ -334,14 +399,16 @@ export class JdList implements OnInit {
 
     this.jdService.delete(target.jobDescriptionId).subscribe({
       next: () => {
-        this.jobDescriptions.update(list => list.filter(j => j.jobDescriptionId !== target.jobDescriptionId));
+        this.jobDescriptions.update((list) =>
+          list.filter((j) => j.jobDescriptionId !== target.jobDescriptionId),
+        );
         this.deleteTarget.set(null);
         this.toast.success('Job description deleted.');
       },
       error: (err) => {
         this.deleteTarget.set(null);
         this.toast.error(extractErrorMessage(err, 'Could not delete this job description.'));
-      }
+      },
     });
   }
 
@@ -354,4 +421,3 @@ export class JdList implements OnInit {
     this.load(page);
   }
 }
-

@@ -20,6 +20,10 @@ export class JobDescriptionService {
     return this.http.get<JobDescriptionResponse>(`${this.baseUrl}/${id}`);
   }
 
+  getFile(id: number): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/${id}/file`, { responseType: 'blob' });
+  }
+
   createFromFile(file: File, company?: string, jobTitle?: string): Observable<JobDescriptionResponse> {
     const formData = new FormData();
     formData.append('file', file);
@@ -51,4 +55,3 @@ export class JobDescriptionService {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 }
-

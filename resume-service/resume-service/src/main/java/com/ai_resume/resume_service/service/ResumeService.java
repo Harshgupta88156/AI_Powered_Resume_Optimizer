@@ -258,6 +258,15 @@ public class ResumeService {
         return toJobDescriptionResponse(findJobDescriptionOrThrow(userId, jobDescriptionId), true);
     }
 
+    @Transactional(readOnly = true)
+    public DownloadedFile downloadJobDescription(Long userId, Long jobDescriptionId) {
+        JobDescription jobDescription = findJobDescriptionOrThrow(userId, jobDescriptionId);
+        return new DownloadedFile(
+                cloudinaryService.download(jobDescription.getCloudinaryUrl()),
+                jobDescription.getFileName(),
+                jobDescription.getContentType());
+    }
+
     /**
      * Renames / re-edits a job description.
      *
@@ -783,5 +792,8 @@ public class ResumeService {
                 .createdAt(analysis.getCreatedAt())
                 .completedAt(analysis.getCompletedAt())
                 .build();
+    }
+
+    public record DownloadedFile(byte[] content, String fileName, String contentType) {
     }
 }

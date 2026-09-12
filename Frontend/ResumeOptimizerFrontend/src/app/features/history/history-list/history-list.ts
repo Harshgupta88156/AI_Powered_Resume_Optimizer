@@ -4,7 +4,10 @@ import { RouterLink } from '@angular/router';
 import { HistoryService } from '../../../core/services/history.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { extractErrorMessage } from '../../../core/utils/error.util';
-import { AnalysisComparisonResponse, HistoryTimelineItemResponse } from '../../../core/models/history.model';
+import {
+  AnalysisComparisonResponse,
+  HistoryTimelineItemResponse,
+} from '../../../core/models/history.model';
 import { AnalysisStatus } from '../../../core/models/analysis.model';
 import { Spinner } from '../../../shared/components/spinner/spinner';
 import { Pagination } from '../../../shared/components/pagination/pagination';
@@ -15,10 +18,9 @@ import { EmptyState } from '../../../shared/components/empty-state/empty-state';
   standalone: true,
   imports: [CommonModule, RouterLink, Spinner, EmptyState, Pagination],
   templateUrl: './history-list.html',
-  styleUrl: './history-list.css'
+  styleUrl: './history-list.css',
 })
 export class HistoryList implements OnInit {
-
   private historyService = inject(HistoryService);
   private toast = inject(ToastService);
 
@@ -28,7 +30,7 @@ export class HistoryList implements OnInit {
   page = signal(0);
   totalPages = signal(0);
   totalElements = signal(0);
-  readonly pageSize = 20;
+  readonly pageSize = 5;
 
   showFilters = signal(false);
   filterCompany = signal('');
@@ -49,27 +51,29 @@ export class HistoryList implements OnInit {
     this.loading.set(true);
     this.error.set('');
 
-    this.historyService.search({
-      page,
-      size: 20,
-      company: this.filterCompany() || undefined,
-      jobTitle: this.filterJobTitle() || undefined,
-      status: (this.filterStatus() || undefined) as AnalysisStatus | undefined,
-      from: this.filterFrom() || undefined,
-      to: this.filterTo() || undefined
-    }).subscribe({
-      next: (res) => {
-        this.items.set(res.content);
-        this.page.set(res.number);
-        this.totalPages.set(res.totalPages);
-        this.totalElements.set(res.totalElements);
-        this.loading.set(false);
-      },
-      error: (err) => {
-        this.error.set(extractErrorMessage(err, 'Could not load history.'));
-        this.loading.set(false);
-      }
-    });
+    this.historyService
+      .search({
+        page,
+        size: this.pageSize,
+        company: this.filterCompany() || undefined,
+        jobTitle: this.filterJobTitle() || undefined,
+        status: (this.filterStatus() || undefined) as AnalysisStatus | undefined,
+        from: this.filterFrom() || undefined,
+        to: this.filterTo() || undefined,
+      })
+      .subscribe({
+        next: (res) => {
+          this.items.set(res.content);
+          this.page.set(res.number);
+          this.totalPages.set(res.totalPages);
+          this.totalElements.set(res.totalElements);
+          this.loading.set(false);
+        },
+        error: (err) => {
+          this.error.set(extractErrorMessage(err, 'Could not load history.'));
+          this.loading.set(false);
+        },
+      });
   }
 
   applyFilters(): void {
@@ -86,7 +90,7 @@ export class HistoryList implements OnInit {
   }
 
   toggleFilters(): void {
-    this.showFilters.update(v => !v);
+    this.showFilters.update((v) => !v);
   }
 
   goToPage(page: number): void {
@@ -103,18 +107,22 @@ export class HistoryList implements OnInit {
 
   statusClass(status: string): string {
     switch (status) {
-      case 'COMPLETED': return 'badge-success';
-      case 'FAILED': return 'badge-danger';
-      case 'PROCESSING': return 'badge-warning';
-      default: return 'badge-neutral';
+      case 'COMPLETED':
+        return 'badge-success';
+      case 'FAILED':
+        return 'badge-danger';
+      case 'PROCESSING':
+        return 'badge-warning';
+      default:
+        return 'badge-neutral';
     }
   }
 
   toggleCompareSelection(analysisId: number, event: Event): void {
     event.stopPropagation();
-    this.selectedForCompare.update(list => {
+    this.selectedForCompare.update((list) => {
       if (list.includes(analysisId)) {
-        return list.filter(id => id !== analysisId);
+        return list.filter((id) => id !== analysisId);
       }
       if (list.length >= 2) {
         return [list[1], analysisId];
@@ -140,7 +148,7 @@ export class HistoryList implements OnInit {
       error: (err) => {
         this.comparing.set(false);
         this.toast.error(extractErrorMessage(err, 'Could not compare these analyses.'));
-      }
+      },
     });
   }
 
@@ -149,4 +157,3 @@ export class HistoryList implements OnInit {
     this.selectedForCompare.set([]);
   }
 }
-

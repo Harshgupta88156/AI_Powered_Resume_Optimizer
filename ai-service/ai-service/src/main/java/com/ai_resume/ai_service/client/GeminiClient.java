@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,14 @@ public class GeminiClient {
     }
 
     public String generate(String prompt) {
+        return generate(prompt, false);
+    }
+
+    public String generateJson(String prompt) {
+        return generate(prompt, true);
+    }
+
+    private String generate(String prompt, boolean jsonResponse) {
         if (apiKey == null || apiKey.isBlank()) {
             throw new IllegalStateException(
                     "GEMINI_API_KEY is not configured"
@@ -41,17 +50,33 @@ public class GeminiClient {
                                         Map.of("text", prompt)
                                 )
                         )
-                )
+                ),
+                "generationConfig", jsonResponse
+                        ? Map.of("responseMimeType", "application/json")
+                        : Map.of()
         );
 
-        JsonNode response = restClient
-                .post()
-                .uri(generateEndpoint, model)
-                .header("X-goog-api-key", apiKey)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(requestBody)
-                .retrieve()
-                .body(JsonNode.class);
+        JsonNode response;
+        try {
+            response = restClient
+                    .post()
+                    .uri(generateEndpoint, model)
+                    .header("X-goog-api-key", apiKey)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(requestBody)
+                    .retrieve()
+                    .body(JsonNode.class);
+        } catch (RestClientResponseException ex) {
+            String providerMessage = ex.getResponseBodyAsString();
+            if (providerMessage.length() > 600) {
+                providerMessage = providerMessage.substring(0, 600);
+            }
+            throw new IllegalStateException(
+                    "Gemini request failed with HTTP "
+                            + ex.getStatusCode().value() + ": " + providerMessage,
+                    ex
+            );
+        }
 
         if (response == null) {
             throw new IllegalStateException(
@@ -69,8 +94,7 @@ public class GeminiClient {
 
         if (generatedText.isMissingNode() || generatedText.asText().isBlank()) {
             throw new IllegalStateException(
-                    "Gemini response did not contain generated text: "
-                            + response
+                    "Gemini response did not contain generated text: " + response
             );
         }
 

@@ -205,8 +205,10 @@
         <!-- READ: original document -->
         <div class="jd-file-view" *ngIf="viewTab() === 'file'">
 
+          <app-spinner *ngIf="fileLoading()" label="Loading original file..."></app-spinner>
+
           <iframe
-            *ngIf="canEmbedFile() && safeFileUrl() as src"
+            *ngIf="!fileLoading() && canEmbedFile() && safeFileUrl() as src"
             [src]="src"
             title="Job description document"
             class="jd-file-frame"></iframe>
@@ -240,12 +242,11 @@
           class="btn-outline btn-sm"
           (click)="startEdit()">Edit / Rename</button>
 
-        <a
+        <button
           *ngIf="!editing() && jd.cloudinaryUrl"
-          [href]="jd.cloudinaryUrl"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="btn-ghost btn-sm jd-analyze">Open original file</a>
+          type="button"
+          (click)="openOriginalFile()"
+          class="btn-ghost btn-sm jd-analyze">Open original file</button>
 
         <button
           type="button"
@@ -272,4 +273,3 @@
   (confirm)="confirmDelete()"
   (cancel)="cancelDelete()"
 ></app-confirm-dialog>
-
