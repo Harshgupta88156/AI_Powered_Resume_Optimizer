@@ -262,7 +262,9 @@ public class ResumeService {
     public DownloadedFile downloadJobDescription(Long userId, Long jobDescriptionId) {
         JobDescription jobDescription = findJobDescriptionOrThrow(userId, jobDescriptionId);
         return new DownloadedFile(
-                cloudinaryService.download(jobDescription.getCloudinaryUrl()),
+                cloudinaryService.download(
+                        jobDescription.getCloudinaryUrl(),
+                        jobDescription.getCloudinaryPublicId()),
                 jobDescription.getFileName(),
                 jobDescription.getContentType());
     }

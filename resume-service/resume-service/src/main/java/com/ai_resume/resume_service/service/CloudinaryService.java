@@ -86,16 +86,24 @@ public class CloudinaryService {
      * receives the correct content type and the user's authorization is checked
      * by the API before the asset is returned.
      */
-    public byte[] download(String secureUrl) {
+    public byte[] download(String secureUrl, String publicId) {
         if (secureUrl == null || secureUrl.isBlank()) {
             throw new FileProcessingException("The original file is not available", null);
         }
 
         URI uri;
         try {
-            uri = URI.create(secureUrl);
+            String deliveryUrl = secureUrl;
+            if (publicId != null && !publicId.isBlank()) {
+                deliveryUrl = cloudinary.url()
+                        .resourceType("raw")
+                        .secure(true)
+                        .signed(true)
+                        .generate(publicId);
+            }
+            uri = URI.create(deliveryUrl);
         } catch (IllegalArgumentException ex) {
-            throw new FileProcessingException("The stored original file URL is invalid", ex);
+            throw new FileProcessingException("The original file delivery URL is invalid", ex);
         }
 
         if (!"https".equalsIgnoreCase(uri.getScheme())
