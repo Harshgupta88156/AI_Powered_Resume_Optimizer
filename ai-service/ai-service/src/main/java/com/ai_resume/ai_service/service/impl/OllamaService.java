@@ -7,7 +7,7 @@ import com.ai_resume.ai_service.dto.response.AiAnalysisResponse;
 import com.ai_resume.ai_service.dto.response.MarkdownGenerationResponse;
 import com.ai_resume.ai_service.service.AiService;
 import com.ai_resume.ai_service.util.PromptLoader;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
