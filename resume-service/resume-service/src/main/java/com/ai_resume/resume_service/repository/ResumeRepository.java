@@ -19,6 +19,8 @@ public interface ResumeRepository extends JpaRepository<Resume, Long> {
 
     Optional<Resume> findByResumeIdAndUserId(Long resumeId, Long userId);
 
+    Optional<Resume> findByUserIdAndDisplayName(Long userId, String displayName);
+
     /** Used by the future dashboard: "total resumes". */
     long countByUserId(Long userId);
 }

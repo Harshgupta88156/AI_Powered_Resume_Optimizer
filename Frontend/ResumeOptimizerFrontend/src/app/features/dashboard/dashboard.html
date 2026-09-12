@@ -6,6 +6,9 @@
       <p>Here's an overview of your resume optimization activity.</p>
     </div>
     <div class="page-actions">
+      <button class="btn-outline" type="button" (click)="loadDemoData()" [disabled]="demoLoading()">
+        {{ demoLoading() ? 'Loading demo data...' : 'Load Demo Data' }}
+      </button>
       <a routerLink="/resumes" class="btn-outline">Manage Resumes</a>
       <a routerLink="/analysis" class="btn-primary" style="text-decoration:none;">Run Analysis</a>
     </div>

@@ -2,6 +2,7 @@ package com.ai_resume.resume_service.controller;
 
 import com.ai_resume.resume_service.dto.AnalysisResponse;
 import com.ai_resume.resume_service.dto.AnalysisTriggerRequest;
+import com.ai_resume.resume_service.dto.DemoDataResponse;
 import com.ai_resume.resume_service.dto.JobDescriptionResponse;
 import com.ai_resume.resume_service.dto.JobDescriptionUpdateRequest;
 import com.ai_resume.resume_service.dto.LearningResourceResponse;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ai_resume.resume_service.service.ResumeService;
+import com.ai_resume.resume_service.service.DemoDataService;
 
 /**
  * All endpoints are owner-scoped.
@@ -53,8 +55,15 @@ public class ResumeController {
     private static final String USER_EMAIL_HEADER = "X-User-Email";
 
     private final ResumeService resumeService;
+    private final DemoDataService demoDataService;
 
     // ------------------------------ resumes ------------------------------
+    @PostMapping("/demo-data")
+    public ResponseEntity<DemoDataResponse> seedDemoData(
+            @RequestHeader(USER_ID_HEADER) Long userId) {
+        return ResponseEntity.ok(demoDataService.seedForUser(userId));
+    }
+
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResumeResponse> uploadResume(
             @RequestHeader(USER_ID_HEADER) Long userId,

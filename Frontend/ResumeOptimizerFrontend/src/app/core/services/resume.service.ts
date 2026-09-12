@@ -5,6 +5,13 @@ import { environment } from '../../../environments/environment';
 import { Page } from '../models/api-response.model';
 import { ResumeResponse, ResumeUpdateRequest, ResumeVersionResponse } from '../models/resume.model';
 
+export interface DemoDataResponse {
+  resumesCreated: number;
+  jobDescriptionsCreated: number;
+  analysesCreated: number;
+  alreadyPresent: boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ResumeService {
 
@@ -46,5 +53,8 @@ export class ResumeService {
   listVersions(resumeId: number): Observable<ResumeVersionResponse[]> {
     return this.http.get<ResumeVersionResponse[]>(`${this.baseUrl}/${resumeId}/versions`);
   }
-}
 
+  seedDemoData(): Observable<DemoDataResponse> {
+    return this.http.post<DemoDataResponse>(`${this.baseUrl}/demo-data`, {});
+  }
+}

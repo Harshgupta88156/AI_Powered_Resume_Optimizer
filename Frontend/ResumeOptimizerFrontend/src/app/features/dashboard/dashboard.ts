@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { DashboardService } from '../../core/services/dashboard.service';
 import { AuthService } from '../../core/services/auth.service';
+import { ResumeService } from '../../core/services/resume.service';
 import { DashboardResponse } from '../../core/models/dashboard.model';
 import { extractErrorMessage } from '../../core/utils/error.util';
 import { Spinner } from '../../shared/components/spinner/spinner';
@@ -26,12 +27,14 @@ export class Dashboard implements OnInit {
 
   private dashboardService = inject(DashboardService);
   private authService = inject(AuthService);
+  private resumeService = inject(ResumeService);
 
   currentUser = this.authService.currentUser;
 
   loading = signal(true);
   error = signal('');
   data = signal<DashboardResponse | null>(null);
+  demoLoading = signal(false);
 
   ngOnInit(): void {
     this.load();
@@ -49,6 +52,22 @@ export class Dashboard implements OnInit {
       error: (err) => {
         this.error.set(extractErrorMessage(err, 'Could not load your dashboard right now.'));
         this.loading.set(false);
+      }
+    });
+  }
+
+  loadDemoData(): void {
+    if (this.demoLoading()) return;
+
+    this.demoLoading.set(true);
+    this.resumeService.seedDemoData().subscribe({
+      next: () => {
+        this.demoLoading.set(false);
+        this.load();
+      },
+      error: (err) => {
+        this.error.set(extractErrorMessage(err, 'Could not load demo data.'));
+        this.demoLoading.set(false);
       }
     });
   }
