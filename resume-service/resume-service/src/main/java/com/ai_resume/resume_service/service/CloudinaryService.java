@@ -10,6 +10,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -91,41 +94,82 @@ public class CloudinaryService {
             throw new FileProcessingException("The original file is not available", null);
         }
 
+        List<URI> candidates = new ArrayList<>();
+        if (publicId != null && !publicId.isBlank()) {
+            try {
+                candidates.add(toTrustedUri(privateDownloadUrl(publicId)));
+            } catch (Exception ex) {
+                log.warn("Could not create a private Cloudinary download URL for '{}'", publicId, ex);
+            }
+            candidates.add(toTrustedUri(cloudinary.url()
+                    .resourceType("raw")
+                    .secure(true)
+                    .signed(true)
+                    .generate(publicId)));
+        }
+
+        if (candidates.isEmpty()) {
+            candidates.add(toTrustedUri(secureUrl));
+        }
+
+        int lastStatus = 0;
+        for (URI uri : candidates) {
+            HttpResponse<byte[]> response = request(uri);
+            if (response.statusCode() < 200 || response.statusCode() >= 300) {
+                lastStatus = response.statusCode();
+                continue;
+            }
+            return response.body();
+        }
+
+        throw new FileProcessingException(
+                "Cloudinary returned HTTP " + lastStatus + " while loading the original file",
+                null);
+    }
+
+    private String privateDownloadUrl(String publicId) throws Exception {
+        String format = null;
+        int slash = publicId.lastIndexOf('/');
+        int dot = publicId.lastIndexOf('.');
+        if (dot > slash) {
+            format = publicId.substring(dot + 1);
+            publicId = publicId.substring(0, dot);
+        }
+
+        return cloudinary.privateDownload(
+                publicId,
+                format,
+                ObjectUtils.asMap(
+                        "resource_type", "raw",
+                        "type", "upload",
+                        "attachment", false,
+                        "expires_at", Instant.now().plusSeconds(300).getEpochSecond()));
+    }
+
+    private URI toTrustedUri(String url) {
         URI uri;
         try {
-            String deliveryUrl = secureUrl;
-            if (publicId != null && !publicId.isBlank()) {
-                deliveryUrl = cloudinary.url()
-                        .resourceType("raw")
-                        .secure(true)
-                        .signed(true)
-                        .generate(publicId);
-            }
-            uri = URI.create(deliveryUrl);
+            uri = URI.create(url);
         } catch (IllegalArgumentException ex) {
             throw new FileProcessingException("The original file delivery URL is invalid", ex);
         }
 
-        if (!"https".equalsIgnoreCase(uri.getScheme())
-                || !"res.cloudinary.com".equalsIgnoreCase(uri.getHost())) {
-            throw new FileProcessingException("The stored original file URL is not trusted", null);
+        boolean trustedHost = "res.cloudinary.com".equalsIgnoreCase(uri.getHost())
+                || "api.cloudinary.com".equalsIgnoreCase(uri.getHost());
+        if (!"https".equalsIgnoreCase(uri.getScheme()) || !trustedHost) {
+            throw new FileProcessingException("The original file delivery URL is not trusted", null);
         }
+        return uri;
+    }
 
+    private HttpResponse<byte[]> request(URI uri) {
         try {
-            HttpResponse<byte[]> response = httpClient.send(
+            return httpClient.send(
                     HttpRequest.newBuilder(uri)
                             .timeout(Duration.ofSeconds(30))
                             .GET()
                             .build(),
                     HttpResponse.BodyHandlers.ofByteArray());
-
-            if (response.statusCode() < 200 || response.statusCode() >= 300) {
-                throw new FileProcessingException(
-                        "Cloudinary returned HTTP " + response.statusCode()
-                                + " while loading the original file",
-                        null);
-            }
-            return response.body();
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
             throw new FileProcessingException("Loading the original file was interrupted", ex);
